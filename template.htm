@@ -1,0 +1,220 @@
+<html><head><title>Youtube statistics</title>
+<!-- 23/12/28 -->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<link rel="stylesheet" href="you.css">
+</head>
+
+<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+<script type="text/javascript">
+    google.load("visualization", "1", {packages:["corechart"]});
+    google.setOnLoadCallback(
+        function() {
+            var data = google.visualization.arrayToDataTable([
+    [       '', '回数'],
+%daily_graph%
+            ]);
+    
+            var options = {
+                title: '日別回数',
+                colors: ['#00aae8'] ,
+                hAxis: {title: '日'}
+            };
+    
+            var chart = new google.visualization.ColumnChart(document.getElementById('daily_graph'));
+            chart.draw(data, options);
+        }
+    );
+</script>
+
+<script type="text/javascript">
+    google.load("visualization", "1", {packages:["corechart"]});
+    google.setOnLoadCallback(
+        function() {
+            var data = google.visualization.arrayToDataTable([
+    [       '', '回数'],
+%move_ave_graph30%
+            ]);
+    
+            var options = {
+                title: '日別移動平均',
+                colors: ['#00aae8'] ,
+                hAxis: {title: '日'}
+            };
+    
+            var chart = new google.visualization.LineChart(document.getElementById('move_ave_graph30'));
+            chart.draw(data, options);
+        }
+    );
+</script>
+
+<script type="text/javascript">
+    google.load("visualization", "1", {packages:["corechart"]});
+    google.setOnLoadCallback(
+        function() {
+            var data = google.visualization.arrayToDataTable([
+    [       '', '回数'],
+%move_ave_graph90%
+            ]);
+    
+            var options = {
+                title: '日別移動平均',
+                colors: ['#00aae8'] ,
+                hAxis: {title: '日'}
+            };
+    
+            var chart = new google.visualization.LineChart(document.getElementById('move_ave_graph90'));
+            chart.draw(data, options);
+        }
+    );
+</script>
+
+<script type="text/javascript">
+    google.load("visualization", "1", {packages:["corechart"]});
+    google.setOnLoadCallback(
+        function() {
+            var data = google.visualization.arrayToDataTable([
+    [       '', '回数'],
+%move_ave_graph365%
+            ]);
+    
+            var options = {
+                title: '日別移動平均',
+                colors: ['#00aae8'] ,
+                hAxis: {title: '日'}
+            };
+    
+            var chart = new google.visualization.LineChart(document.getElementById('move_ave_graph365'));
+            chart.draw(data, options);
+        }
+    );
+</script>
+
+<script type="text/javascript">
+    google.load("visualization", "1", {packages:["corechart"]});
+    google.setOnLoadCallback(
+        function() {
+            var data = google.visualization.arrayToDataTable([
+    [       '', '1日平均回数'],
+%month_graph%
+            ]);
+    
+            var options = {
+                title: '月別回数',
+                colors: ['#00aae8'] ,
+                hAxis: {title: '年月'}
+            };
+    
+            var chart = new google.visualization.ColumnChart(document.getElementById('monthly_graph'));
+            chart.draw(data, options);
+        }
+    );
+</script>
+
+<h1>Youtube集計</h1>
+<span style="font-size:12px;">Ver : %version%</span>
+<span style="font-size:12px;">実行日時   : %today%</span>
+<span style="font-size:12px;">最終データ : %lastdate%</span>
+<h2>再生回数</h2>
+<table>
+<tr>
+<th></th><th>日集計</th><th colspan="2">週集計</th><th colspan="2">月集計</th>
+<th colspan="2">3ヶ月集計</th>
+<th colspan="2">総集計</th>
+<th></th><th></th><th></th>
+</tr>
+
+<tr>
+<th>タイトル</th><th>回数</th>
+<th>　回数</th><th>　平均</th>
+<th>　回数</th><th>　平均</th>
+<th>　回数</th><th>　平均</th>
+<th>　回数</th><th>　平均</th>
+<th>登録日</th><th>good</th><th>増分</th>
+</tr>
+%replay_table
+</table>
+<br>
+<h2>日別再生回数</h2>
+<div id="daily_graph" style="width:800px; height:300px;  margin-top:20px ; margin-left:  50px; " ></div>
+<br>
+<h2>日別再生移動平均</h2>
+<div class="flex">
+    <div class='frame'>
+        <span style="margin-left: 30px;">30日</span>
+        <div id="move_ave_graph30" style="width:600px; height:300px;  margin-top:5px ; margin-left:  10px; margin-right:  10px;" ></div>
+        <br>
+    </div>
+    <div class='frame'>
+        <span style="margin-left: 30px;">90日</span>
+        <div id="move_ave_graph90" style="width:600px; height:300px;  margin-top:5px ; margin-left:  10px; margin-right:  10px;" ></div>
+        <br>
+    </div>
+</div>
+<div class="flex">
+<div class='frame'>
+    <span style="margin-left: 30px;">365日</span>
+    <div id="move_ave_graph365" style="width:600px; height:300px;  margin-top:5px ; margin-left:  10px; margin-right:  10px;" ></div>
+    <br>
+</div>
+</div>
+<br>
+
+<h2>月別平均再生回数</h2>
+<div id="monthly_graph" style="width:600px; height:300px;  margin-top:20px ; margin-left:  50px; " ></div>
+<h2>状況</h2>
+<iframe src="https://pixe.la/v1/users/hama777/graphs/youtube?mode=simple" height="155" width="720" frameborder="0">
+</iframe>
+<h2>再生回数ランキング 最大</h2>
+<div class="flex">
+    <div class='frame'>
+        <span style="margin-left: 30px;">総合 (1～10位)</span>
+        <table class="rank">
+        <tr><th>順位</th><th>日付</th><th>回数</th></tr>
+        %daily_rank1%
+        </table>
+    </div>
+    <div class='frame'>
+        <span style="margin-left: 30px;">総合 (11～20位)</span>
+        <table class="rank">
+        <tr><th>順位</th><th>日付</th><th>回数</th></tr>
+        %daily_rank2%
+        </table>
+    </div>
+    <div class='frame'>
+        <span style="margin-left: 30px;">過去30日</span>
+        <table class="rank">
+        <tr><th>順位</th><th>日付</th><th>回数</th></tr>
+        %monthly_rank%
+        </table>
+    </div>
+</div>
+<h2>再生回数ランキング 最小</h2>
+<div class="flex">
+    <div class='frame'>
+        <span style="margin-left: 30px;">総合 (1～10位)</span>
+        <table class="rank">
+        <tr><th>順位</th><th>日付</th><th>回数</th></tr>
+        %daily_rank3%
+        </table>
+    </div>
+    <div class='frame'>
+        <span style="margin-left: 30px;">総合 (11～20位)</span>
+        <table class="rank">
+        <tr><th>順位</th><th>日付</th><th>回数</th></tr>
+        %daily_rank4%
+        </table>
+    </div>
+    <div class='frame'>
+        <span style="margin-left: 30px;">過去30日</span>
+        <table class="rank">
+        <tr><th>順位</th><th>日付</th><th>回数</th></tr>
+        %monthly_rank2%
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
+
+
