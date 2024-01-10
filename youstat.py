@@ -8,7 +8,7 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-version = "1.22"   #  24/01/04
+version = "1.23"   #  24/01/10
 
 debug = 0
 logf = ""
@@ -132,13 +132,15 @@ def create_repcount_info() :
                 video_info[key] = allrep
         rep_info[vid] = video_info
 
-    print(rep_info)
+    #print(rep_info)
     #output_replay_count2()
 
 # 再生回数情報 rep_info を参照し各期間の再生回数を出力する
 def output_replay_count2() :
     csvout = open(csvfile,'w' ,  encoding='utf-8')
     csvout.write('タイトル,日,週,月,四半期,全期,投稿日,Good\n')
+    key_list = ["week","mon","mon3","all"]     #  調査する期間
+    days_list = {"week":7,"mon":30,"mon3":90}     #  調査する期間
     for vid,video_info in rep_info.items() :
         title = idlist[vid]
         cdatestr = cdatelist[vid]
@@ -163,12 +165,23 @@ def output_replay_count2() :
             diff_good = good_cnt
 
         out.write(f'<tr><td>{title}</td>'
-                  f'<td align="right">{video_info["day"]}</td>'
-                  f'<td align="right">{video_info["week"]}</td><td align="right">{video_info["week"]/weekdays:.2f}</td>'
-                  f'<td align="right">{video_info["mon"]}</td><td align="right">{video_info["mon"]/monthdays:.2f}</td>'
-                  f'<td align="right">{video_info["mon3"]}</td><td align="right">{video_info["mon3"]/month3days:.2f}</td>' 
-                  f'<td align="right">{video_info["all"]}</td><td align="right">{video_info["all"]/fromdays:.2f}</td>'
-                  f'<td align="right">{cdatestr}</td>'
+                  f'<td align="right">{video_info["day"]}</td>')
+
+        for k in key_list :
+            if k == "all" :
+                days = fromdays
+            else :
+                if fromdays < days_list[k] :
+                    days = fromdays
+                else :
+                    days = days_list[k]
+            out.write(f'<td align="right">{video_info[k]}</td><td align="right">{video_info[k]/days:.2f}</td>')
+
+        # out.write(f'<td align="right">{video_info["week"]}</td><td align="right">{video_info["week"]/weekdays:.2f}</td>'
+        #           f'<td align="right">{video_info["mon"]}</td><td align="right">{video_info["mon"]/monthdays:.2f}</td>'
+        #           f'<td align="right">{video_info["mon3"]}</td><td align="right">{video_info["mon3"]/month3days:.2f}</td>' 
+        #           f'<td align="right">{video_info["all"]}</td><td align="right">{video_info["all"]/fromdays:.2f}</td>')
+        out.write(f'<td align="right">{cdatestr}</td>'
                   f'<td align="right">{good_cnt}</td>'
                   f'<td align="right">{diff_good}</td></tr>\n')
         #csvout.write(f'{title},{up},{weekup},{monup},{mon3up},{count},{cdatestr},{good_cnt}\n')
