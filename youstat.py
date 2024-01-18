@@ -8,7 +8,7 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-version = "1.23"   #  24/01/10
+version = "1.24"   #  24/01/18
 
 debug = 0
 logf = ""
@@ -132,8 +132,6 @@ def create_repcount_info() :
                 video_info[key] = allrep
         rep_info[vid] = video_info
 
-    #print(rep_info)
-    #output_replay_count2()
 
 # 再生回数情報 rep_info を参照し各期間の再生回数を出力する
 def output_replay_count2() :
@@ -177,125 +175,10 @@ def output_replay_count2() :
                     days = days_list[k]
             out.write(f'<td align="right">{video_info[k]}</td><td align="right">{video_info[k]/days:.2f}</td>')
 
-        # out.write(f'<td align="right">{video_info["week"]}</td><td align="right">{video_info["week"]/weekdays:.2f}</td>'
-        #           f'<td align="right">{video_info["mon"]}</td><td align="right">{video_info["mon"]/monthdays:.2f}</td>'
-        #           f'<td align="right">{video_info["mon3"]}</td><td align="right">{video_info["mon3"]/month3days:.2f}</td>' 
-        #           f'<td align="right">{video_info["all"]}</td><td align="right">{video_info["all"]/fromdays:.2f}</td>')
         out.write(f'<td align="right">{cdatestr}</td>'
                   f'<td align="right">{good_cnt}</td>'
                   f'<td align="right">{diff_good}</td></tr>\n')
         #csvout.write(f'{title},{up},{weekup},{monup},{mon3up},{count},{cdatestr},{good_cnt}\n')
-
-    csvout.close()
-
-#   未使用
-#   video_info を作成する。  
-#   video_info は辞書  キー vid  値  repinfo
-#   repinfo は辞書  キー   prev_rep,week_rep,mon_rep,mon3_rep,replay  値 前日、週、月、。。までの再生回数             
-def today_stat() :
-    global video_info
-
-    previous_day = lastdate - timedelta(1)
-    previous_week = lastdate - timedelta(7)
-    previous_month = lastdate - timedelta(30)  
-    previous_month3 = lastdate - timedelta(90)   
-
-    today_df = df[df['date'] == lastdate]
-    today_rep_tmp = {}
-    for index,row in today_df.iterrows() :
-        today_rep_tmp[row.vid] = row.replay
-
-    today_rep = {}    #  キー  vid  値   当日までの再生回数   
-    today_rep = sorted(today_rep_tmp.items(), key=lambda x:x[1],reverse=True)
-    today_rep = dict((x, y) for x, y in today_rep)
-    
-    prevday_df = df[df['date'] == previous_day]
-    prev_rep = {}     #  キー  vid  値   前日までの再生回数   
-    for index,row in prevday_df.iterrows() :
-        prev_rep[row.vid] = row.replay
-
-    week_df = df[df['date'] == previous_week]
-    week_rep = {}
-    for index,row in week_df.iterrows() :
-        week_rep[row.vid] = row.replay
-
-    mon_df = df[df['date'] == previous_month]
-    mon_rep = {}
-    for index,row in mon_df.iterrows() :
-        mon_rep[row.vid] = row.replay
-
-    mon3_df = df[df['date'] == previous_month3]
-    mon3_rep = {}
-    for index,row in mon3_df.iterrows() :
-        mon3_rep[row.vid] = row.replay
-
-    for vid , rep in today_rep.items() :
-        repinfo = {}
-        repinfo['replay'] = rep
-        if vid in prev_rep :
-            repinfo['prev_rep'] = prev_rep[vid]
-        else :
-            repinfo['prev_rep'] = 0
-        if vid in week_rep :
-            repinfo['week_rep'] = week_rep[vid]
-        else :
-            repinfo['week_rep'] = 0
-        if vid in mon_rep :
-            repinfo['mon_rep'] = mon_rep[vid]
-        else :
-            repinfo['mon_rep'] = 0
-        if vid in mon3_rep :
-            repinfo['mon3_rep'] = mon3_rep[vid]
-        else :
-            repinfo['mon3_rep'] = 0
-        video_info[vid] = repinfo
-    
-    output_replay_count()
-
-#   未使用
-def output_replay_count() :
-    csvout = open(csvfile,'w' ,  encoding='utf-8')
-    csvout.write('タイトル,日,週,月,四半期,全期,投稿日,Good\n')
-    for vid,repinfo in video_info.items() :
-        title = idlist[vid]
-        cdatestr = cdatelist[vid]
-        cdate = dt.strptime(cdatestr, '%y/%m/%d')
-        alldays = lastdate - cdate      
-        fromdays = alldays.days + 1  #  登録日からの日数 初日を 1 とするため +1 する
-        count = repinfo['replay']    #  全再生回数
-        avarage = count / fromdays
-        up = count - repinfo['prev_rep']  # 当日の再生回数  (全再生回数 - 前日の再生回数)
-        weekup = count - repinfo['week_rep']
-        monup = count - repinfo['mon_rep']
-        monuprate = monup / count * 100
-        mon3up = count - repinfo['mon3_rep']
-        weekdays = 7
-        monthdays = 30
-        month3days = 90
-        if fromdays < weekdays :
-            weekdays = fromdays
-        if fromdays < monthdays :
-            monthdays = fromdays
-        if fromdays < month3days :
-            month3days = fromdays
-        good_cnt = int(gooddata[vid])
-        if vid in prev_gooddata :
-            prev_good_cnt = int(prev_gooddata[vid])
-            diff_good = good_cnt - prev_good_cnt
-        else :
-            diff_good = good_cnt
-
-        out.write(f'<tr><td>{title}</td>'
-                  f'<td align="right">{up}</td>'
-                  f'<td align="right">{weekup}</td><td align="right">{weekup/weekdays:.2f}</td>'
-                  f'<td align="right">{monup}</td><td align="right">{monup/monthdays:.2f}</td>'
-                  f'<td align="right">{mon3up}</td><td align="right">{mon3up/month3days:.2f}</td>' 
-                  f'<td align="right">{count}</td><td align="right">{avarage:.2f}</td>'
-                  f'<td align="right">{cdatestr}</td>'
-                  f'<td align="right">{monuprate:.2f}</td>'
-                  f'<td align="right">{good_cnt}</td>'
-                  f'<td align="right">{diff_good}</td></tr>\n')
-        csvout.write(f'{title},{up},{weekup},{monup},{mon3up},{count},{cdatestr},{good_cnt}\n')
 
     csvout.close()
 
@@ -396,7 +279,6 @@ def rank_common(rankdata,half) :
     for chk_date,cnt in rankdata.items() :
         if cnt == 0 :
             continue
-        #print(type(chk_date))
         if chk_date < base_date :
             continue 
         i = i + 1 
@@ -410,8 +292,12 @@ def rank_common(rankdata,half) :
                 return
 
         chk_date = chk_date - datetime.timedelta(days=1)   # 実データと日付が1日ずれているので補正
-        dd = chk_date.strftime('%Y/%m/%d')
-        out.write(f'<tr><td align="right">{i}</td><td>{dd}</td><td align="right">{cnt}</td></tr>')
+        date_str = chk_date.strftime('%Y/%m/%d')
+        dd = lastdate - datetime.timedelta(days=1)
+        if  chk_date.date() == dd.date() :
+            date_str = f'<span class=red>{date_str}</span>'
+
+        out.write(f'<tr><td align="right">{i}</td><td>{date_str}</td><td align="right">{cnt}</td></tr>')
 
 
 def post_pixela() :
