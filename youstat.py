@@ -8,7 +8,7 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-version = "1.24"   #  24/01/18
+version = "1.25"   #  24/01/23
 
 debug = 0
 logf = ""
@@ -51,6 +51,7 @@ def main_proc() :
     create_repcount_info()    
     create_daily_info()
     month_count()   
+    output_top_repcount()  #
     parse_template()
     ftp_upload()
     post_pixela()
@@ -181,6 +182,21 @@ def output_replay_count2() :
         #csvout.write(f'{title},{up},{weekup},{monup},{mon3up},{count},{cdatestr},{good_cnt}\n')
 
     csvout.close()
+
+#  再生回数 top 
+def output_top_repcount() :
+    vid_list = []
+    rep_list = []
+    for vid,video_info in rep_info.items() :
+        vid_list.append(vid)
+        rep_list.append(video_info["day"])
+
+    df_repcnt = pd.DataFrame(list(zip(vid_list,rep_list)), columns = ['vid','repcnt'])
+    sorted_df_repcnt  = df_repcnt.sort_values('repcnt',ascending=False)
+    for _,row  in sorted_df_repcnt.iterrows() :
+        title = idlist[row['vid']]
+        print(f"{title} {row['repcnt']}")
+
 
 #  日ごとの再生回数を収めた辞書 daily_info を生成する
 def create_daily_info() :
