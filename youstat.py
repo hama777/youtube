@@ -8,7 +8,7 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-version = "1.26"   #  24/01/24
+version = "1.27"   #  24/01/26
 
 debug = 0
 logf = ""
@@ -147,15 +147,15 @@ def output_replay_count2() :
         alldays = lastdate - cdate      
         fromdays = alldays.days + 1  #  登録日からの日数 初日を 1 とするため +1 する
         
-        weekdays = 7
-        monthdays = 30
-        month3days = 90
-        if fromdays < weekdays :
-            weekdays = fromdays
-        if fromdays < monthdays :
-            monthdays = fromdays
-        if fromdays < month3days :
-            month3days = fromdays
+        # weekdays = 7
+        # monthdays = 30
+        # month3days = 90
+        # if fromdays < weekdays :
+        #     weekdays = fromdays
+        # if fromdays < monthdays :
+        #     monthdays = fromdays
+        # if fromdays < month3days :
+        #     month3days = fromdays
         good_cnt = int(gooddata[vid])
         if vid in prev_gooddata :
             prev_good_cnt = int(prev_gooddata[vid])
@@ -188,7 +188,7 @@ def output_top_repcount() :
     top_repcount_com("week")
 
 def top_repcount_com(key) :
-    n_order = 3   #  何位まで表示するか
+    n_order = 5   #  何位まで表示するか
     vid_list = []
     rep_list = []
     for vid,video_info in rep_info.items() :
@@ -444,6 +444,15 @@ def parse_template() :
             continue
         if "%top_replay%" in line :
             top_repcount_com("day")
+            continue
+        if "%top_replay_week%" in line :
+            top_repcount_com("week")
+            continue
+        if "%top_replay_month%" in line :
+            top_repcount_com("mon")
+            continue
+        if "%top_replay_month3%" in line :
+            top_repcount_com("mon3")
             continue
         if "%version%" in line :
             s = line.replace("%version%",version)
