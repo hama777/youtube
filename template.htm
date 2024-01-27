@@ -1,5 +1,5 @@
 <html><head><title>Youtube statistics</title>
-<!-- 24/01/24 -->
+<!-- 24/01/26 -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="you.css">
@@ -138,14 +138,46 @@
 <h2>日別再生回数</h2>
 <div id="daily_graph" style="width:800px; height:300px;  margin-top:20px ; margin-left:  50px; " ></div>
 <br>
-<h2>再生回数Top</h2>
-昨日
-<table>
-    <tr>
-        <th>順位</th><th>タイトル</th><th>回数</th>
-    </tr>
-    %top_replay%
-</table>
+<h2>タイトル別再生回数Top</h2>
+<div class="flex">
+    <div >
+        <span style="margin-left: 30px;">昨日</span>
+        <table class="rank">
+            <tr>
+                <th>順位</th><th>タイトル</th><th>回数</th>
+            </tr>
+            %top_replay%
+        </table>
+    </div>
+    <div >
+        <span style="margin-left: 30px;">1週間</span>
+        <table class="rank">
+            <tr>
+                <th>順位</th><th>タイトル</th><th>回数</th>
+            </tr>
+            %top_replay_week%
+        </table>
+    </div>
+    <div >
+        <span style="margin-left: 30px;">1ヶ月</span>
+        <table class="rank">
+            <tr>
+                <th>順位</th><th>タイトル</th><th>回数</th>
+            </tr>
+            %top_replay_month%
+        </table>
+    </div>
+    <div >
+        <span style="margin-left: 30px;">3ヶ月</span>
+        <table class="rank">
+            <tr>
+                <th>順位</th><th>タイトル</th><th>回数</th>
+            </tr>
+            %top_replay_month3%
+        </table>
+    </div>
+</div>
+
 <br>
 <h2>日別再生移動平均</h2>
 <div class="flex">
