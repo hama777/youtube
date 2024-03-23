@@ -1,5 +1,5 @@
 <html><head><title>Youtube statistics</title>
-<!-- 24/01/26 -->
+<!-- 24/03/23 -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="you.css">
@@ -17,8 +17,10 @@
     
             var options = {
                 title: '日別回数',
+                chartArea: { backgroundColor: '#f1f7f9' , left:50,right:30 },
                 colors: ['#00aae8'] ,
-                hAxis: {title: '日'}
+                hAxis: {title: '日'},
+                legend: { position: 'none' }
             };
     
             var chart = new google.visualization.ColumnChart(document.getElementById('daily_graph'));
@@ -39,7 +41,8 @@
             var options = {
                 title: '日別移動平均',
                 colors: ['#00aae8'] ,
-                hAxis: {title: '日'}
+                hAxis: {title: '日'},
+                curveType: 'function'
             };
     
             var chart = new google.visualization.LineChart(document.getElementById('move_ave_graph30'));
@@ -60,7 +63,8 @@
             var options = {
                 title: '日別移動平均',
                 colors: ['#00aae8'] ,
-                hAxis: {title: '日'}
+                hAxis: {title: '日'},
+                curveType: 'function'
             };
     
             var chart = new google.visualization.LineChart(document.getElementById('move_ave_graph90'));
@@ -81,7 +85,8 @@
             var options = {
                 title: '日別移動平均',
                 colors: ['#00aae8'] ,
-                hAxis: {title: '日'}
+                hAxis: {title: '日'},
+                curveType: 'function'
             };
     
             var chart = new google.visualization.LineChart(document.getElementById('move_ave_graph365'));
@@ -101,8 +106,10 @@
     
             var options = {
                 title: '月別回数',
+                chartArea: { backgroundColor: '#f1f7f9' , left:50,right:30 },
                 colors: ['#00aae8'] ,
-                hAxis: {title: '年月'}
+                hAxis: {title: '年月'},
+                legend: { position: 'none' }
             };
     
             var chart = new google.visualization.ColumnChart(document.getElementById('monthly_graph'));
