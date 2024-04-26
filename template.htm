@@ -1,5 +1,5 @@
 <html><head><title>Youtube statistics</title>
-<!-- 24/03/23 -->
+<!-- 24/04/26 -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="you.css">
@@ -42,7 +42,9 @@
                 title: '日別移動平均',
                 colors: ['#00aae8'] ,
                 hAxis: {title: '日'},
-                curveType: 'function'
+                chartArea: { backgroundColor: '#f1f7f9' , left:50,right:30},
+                curveType: 'function',
+                legend: { position: 'none' }
             };
     
             var chart = new google.visualization.LineChart(document.getElementById('move_ave_graph30'));
@@ -64,7 +66,9 @@
                 title: '日別移動平均',
                 colors: ['#00aae8'] ,
                 hAxis: {title: '日'},
-                curveType: 'function'
+                chartArea: { backgroundColor: '#f1f7f9' , left:50,right:30},
+                curveType: 'function',
+                legend: { position: 'none' }
             };
     
             var chart = new google.visualization.LineChart(document.getElementById('move_ave_graph90'));
@@ -86,7 +90,9 @@
                 title: '日別移動平均',
                 colors: ['#00aae8'] ,
                 hAxis: {title: '日'},
-                curveType: 'function'
+                chartArea: { backgroundColor: '#f1f7f9' , left:50,right:30},
+                curveType: 'function',
+                legend: { position: 'none' }
             };
     
             var chart = new google.visualization.LineChart(document.getElementById('move_ave_graph365'));
