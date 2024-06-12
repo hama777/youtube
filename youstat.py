@@ -8,7 +8,7 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-version = "1.27"   #  24/01/26
+version = "1.28"   #  24/06/13
 
 debug = 0
 logf = ""
@@ -39,6 +39,7 @@ video_info = {}    # キー  vid : 値  (キー 現再生回数 , キー 前日�
 daily_info = {}    # 日別再生回数  キー  日付  値  再生回数
 monthly_info = {}  # 月別再生回数  キー  yymm 値  総再生回数
 mon_data = {}      # 今月のデータ(ランキング用)  キー  日付  値  再生回数  
+year_data = {}       
 ftp_host = ftp_user = ftp_pass = ftp_url =  ""
 pixela_url = ""
 pixela_token = ""
@@ -51,7 +52,6 @@ def main_proc() :
     create_repcount_info()    
     create_daily_info()
     month_count()   
-    #output_top_repcount()  #
     parse_template()
     ftp_upload()
     post_pixela()
@@ -147,15 +147,6 @@ def output_replay_count2() :
         alldays = lastdate - cdate      
         fromdays = alldays.days + 1  #  登録日からの日数 初日を 1 とするため +1 する
         
-        # weekdays = 7
-        # monthdays = 30
-        # month3days = 90
-        # if fromdays < weekdays :
-        #     weekdays = fromdays
-        # if fromdays < monthdays :
-        #     monthdays = fromdays
-        # if fromdays < month3days :
-        #     month3days = fromdays
         good_cnt = int(gooddata[vid])
         if vid in prev_gooddata :
             prev_good_cnt = int(prev_gooddata[vid])
@@ -179,7 +170,6 @@ def output_replay_count2() :
         out.write(f'<td align="right">{cdatestr}</td>'
                   f'<td align="right">{good_cnt}</td>'
                   f'<td align="right">{diff_good}</td></tr>\n')
-        #csvout.write(f'{title},{up},{weekup},{monup},{mon3up},{count},{cdatestr},{good_cnt}\n')
 
     csvout.close()
 
@@ -208,7 +198,7 @@ def top_repcount_com(key) :
 
 #  日ごとの再生回数を収めた辞書 daily_info を生成する
 def create_daily_info() :
-    global daily_info,mon_data,df_movav30,df_movav90,df_movav365
+    global daily_info,mon_data,year_data,df_movav30,df_movav90,df_movav365
     df_dd = df.copy()   # df のdateにindexを設定するとdf['date']などがエラーになるのでコピー
     df_dd['date'] = pd.to_datetime(df_dd['date'])
     df_dd.set_index('date', inplace=True) 
@@ -226,14 +216,18 @@ def create_daily_info() :
         daily_info[index] = cnt
         old = row.replay
 
-    # 月ランキングのためのデータ mon_data 作成  現在月の 日付がキー  再生回数が値
+    # 年、月ランキングのためのデータ year_data mon_data 作成  現在月の 日付がキー  再生回数が値
     old = -1
-    for index,row in df_dd.tail(31).iterrows():   # 過去31日分のデータを取得
+    i = 0 
+    for index,row in df_dd.tail(365).iterrows():   # 過去31日分のデータを取得
         if old == -1 :    # 最初だけ
             old = row.replay
             continue 
+        i += 1 
         cnt = row.replay - old
-        mon_data[index] = cnt
+        if i  >= 365 - 30  :
+            mon_data[index] = cnt
+        year_data[index] = cnt
         old = row.replay
 
     df_movav30 = calc_dayly_movave(df_dd,30,7)
@@ -270,6 +264,12 @@ def monthly_rank():
 def monthly_rank2():
     rank = {}
     rank = sorted(mon_data.items(), key=lambda x:x[1],reverse=False)
+    rank = dict((x, y) for x, y in rank)
+    rank_common(rank,1)
+
+def year_rank():
+    rank = {}
+    rank = sorted(year_data.items(), key=lambda x:x[1],reverse=True)
     rank = dict((x, y) for x, y in rank)
     rank_common(rank,1)
 
@@ -316,7 +316,7 @@ def rank_common(rankdata,half) :
                 return
 
         chk_date = chk_date - datetime.timedelta(days=1)   # 実データと日付が1日ずれているので補正
-        date_str = chk_date.strftime('%Y/%m/%d')
+        date_str = chk_date.strftime('%y/%m/%d')
         dd = lastdate - datetime.timedelta(days=1)
         if  chk_date.date() == dd.date() :
             date_str = f'<span class=red>{date_str}</span>'
@@ -441,6 +441,9 @@ def parse_template() :
             continue
         if "%monthly_rank2%" in line :
             monthly_rank2()
+            continue
+        if "%year_rank%" in line :
+            year_rank()
             continue
         if "%top_replay%" in line :
             top_repcount_com("day")
