@@ -8,7 +8,7 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-version = "1.28"   #  24/06/13
+version = "1.29"   #  24/06/13
 
 debug = 0
 logf = ""
@@ -273,6 +273,12 @@ def year_rank():
     rank = dict((x, y) for x, y in rank)
     rank_common(rank,1)
 
+def year_rank_min():
+    rank = {}
+    rank = sorted(year_data.items(), key=lambda x:x[1],reverse=False)
+    rank = dict((x, y) for x, y in rank)
+    rank_common(rank,1)
+
 def daily_rank1() :
     rank = {}
     rank = sorted(daily_info.items(), key=lambda x:x[1],reverse=True)
@@ -444,6 +450,9 @@ def parse_template() :
             continue
         if "%year_rank%" in line :
             year_rank()
+            continue
+        if "%year_rank_min%" in line :
+            year_rank_min()
             continue
         if "%top_replay%" in line :
             top_repcount_com("day")
