@@ -8,7 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-version = "1.29"   #  24/06/13
+# 25/01/04 v1.30 年対応
+version = "1.30"
 
 debug = 0
 logf = ""
@@ -45,6 +46,7 @@ pixela_url = ""
 pixela_token = ""
 
 def main_proc() :
+    date_settings()
     read_config()
     read_videoid()
     read_dailydata()
@@ -373,7 +375,7 @@ def move_ave_graph(flg) :
 
 def month_count():
     startyy = 2022
-    endyy = 2024
+    endyy = today_yy
     prev_replay = 0 
     for yy in range(startyy, endyy+1) :   
         dfyy = df[df['date'].dt.year == yy]
@@ -479,12 +481,21 @@ def parse_template() :
     f.close()
     out.close()
 
+def date_settings():
+    global  today_date,today_mm,today_dd,today_yy,yesterday,today_datetime
+    today_datetime = datetime.datetime.today()
+    today_date = datetime.date.today()
+    today_mm = today_date.month
+    today_dd = today_date.day
+    today_yy = today_date.year
+    yesterday = today_date - timedelta(days=1)
+
 def curdate(s) :
     s = s.replace("%lastdate%",str(lastdate))
     out.write(s)
 
 def today(s):
-    d = datetime.datetime.today().strftime("%m/%d %H:%M")
+    d = today_datetime.strftime("%m/%d %H:%M")
     s = s.replace("%today%",d)
     out.write(s)
 
