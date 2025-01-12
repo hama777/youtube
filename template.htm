@@ -1,5 +1,5 @@
 <html><head><title>Youtube statistics</title>
-<!-- 24/06/13 -->
+<!-- 25/01/12 v1.31 good率追加 日別再生回数をトップに表示  -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="you.css">
@@ -128,13 +128,16 @@
 <span style="font-size:12px;">Ver : %version%</span>
 <span style="font-size:12px;">実行日時   : %today%</span>
 <span style="font-size:12px;">最終データ : %lastdate%</span>
+<h2>日別再生回数</h2>
+<div id="daily_graph" style="width:800px; height:300px;  margin-top:20px ; margin-left:  50px; " ></div>
+<br>
 <h2>再生回数</h2>
 <table>
 <tr>
 <th></th><th>日集計</th><th colspan="2">週集計</th><th colspan="2">月集計</th>
 <th colspan="2">3ヶ月集計</th>
 <th colspan="2">総集計</th>
-<th></th><th></th><th></th>
+<th></th><th></th><th></th><th></th>
 </tr>
 
 <tr>
@@ -143,13 +146,10 @@
 <th>　回数</th><th>　平均</th>
 <th>　回数</th><th>　平均</th>
 <th>　回数</th><th>　平均</th>
-<th>登録日</th><th>good</th><th>増分</th>
+<th>登録日</th><th>good</th><th>増分</th><th>good率</th>
 </tr>
 %replay_table
 </table>
-<br>
-<h2>日別再生回数</h2>
-<div id="daily_graph" style="width:800px; height:300px;  margin-top:20px ; margin-left:  50px; " ></div>
 <br>
 <h2>タイトル別再生回数Top</h2>
 <div class="flex">
@@ -215,7 +215,7 @@
 <br>
 
 <h2>月別平均再生回数</h2>
-<div id="monthly_graph" style="width:600px; height:300px;  margin-top:20px ; margin-left:  50px; " ></div>
+<div id="monthly_graph" style="width:800px; height:400px;  margin-top:20px ; margin-left:  50px; " ></div>
 <h2>状況</h2>
 <iframe src="https://pixe.la/v1/users/hama777/graphs/youtube?mode=simple" height="155" width="720" frameborder="0">
 </iframe>
