@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/01/04 v1.30 年対応
-version = "1.30"
+# 25/01/12 v1.31 good率追加
+version = "1.31"
 
 debug = 0
 logf = ""
@@ -169,9 +169,10 @@ def output_replay_count2() :
                     days = days_list[k]
             out.write(f'<td align="right">{video_info[k]}</td><td align="right">{video_info[k]/days:.2f}</td>')
 
+        good_rate = good_cnt / video_info['all'] * 100     #  再生回数あたりのgood率
         out.write(f'<td align="right">{cdatestr}</td>'
                   f'<td align="right">{good_cnt}</td>'
-                  f'<td align="right">{diff_good}</td></tr>\n')
+                  f'<td align="right">{diff_good}</td><td align="right">{good_rate:.2f}</td></tr>\n')
 
     csvout.close()
 
