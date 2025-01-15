@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/01/12 v1.31 good率追加
-version = "1.31"
+# 25/01/15 v1.32 網羅率追加
+version = "1.32"
 
 debug = 0
 logf = ""
@@ -175,6 +175,14 @@ def output_replay_count2() :
                   f'<td align="right">{diff_good}</td><td align="right">{good_rate:.2f}</td></tr>\n')
 
     csvout.close()
+
+#   網羅率を取得する
+def get_covering_rate() :
+    cnt = 0
+    for vid,video_info in rep_info.items() :
+        if video_info["day"] != 0 :
+            cnt += 1 
+    return cnt / len(rep_info) * 100
 
 #  再生回数 top 
 def output_top_repcount() :
@@ -468,6 +476,11 @@ def parse_template() :
             continue
         if "%top_replay_month3%" in line :
             top_repcount_com("mon3")
+            continue
+        if "%covering_rate%" in line :
+            rate = f'{get_covering_rate():5.2f} %'
+            s = line.replace("%covering_rate%",rate)
+            out.write(s)
             continue
         if "%version%" in line :
             s = line.replace("%version%",version)
