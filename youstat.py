@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/01/17 v1.33 週、月の網羅率追加
-version = "1.33"
+# 25/01/20 v1.34 網羅率をファイルに出力する
+version = "1.34"
 
 debug = 0
 logf = ""
@@ -22,6 +22,7 @@ templatefile = appdir + "./template.htm"
 resultfile = appdir + "./youtube.htm"
 goodfile = appdir + "./result.txt"    # good の件数取得
 prev_goodfile = appdir + "./prevgood.txt"    # 前回のgood件数 
+coverratefile = appdir + "./coverrate.txt" 
 csvfile = appdir + "./replay.csv" 
 
 idlist = {}       # キー videoid  値  タイトル
@@ -200,6 +201,12 @@ def covering_rate() :
     rate = get_covering_rate()
     s = f"本日: {rate['day']:5.1f}%  今週:{rate['week']:5.1f}%  今月:{rate['mon']:5.1f}%  3ヶ月:{rate['mon3']:5.1f}%"
     out.write(s)
+
+    f = open(coverratefile , 'a', encoding='utf-8')
+    d = today_date.strftime("%y/%m/%d")
+    s = f"{d}\t{rate['day']:5.1f}\t{rate['week']:5.1f}\t{rate['mon']:5.1f}\t{rate['mon3']:5.1f}\n"
+    f.write(s)
+    f.close()
 
 #  再生回数 top 
 def output_top_repcount() :
