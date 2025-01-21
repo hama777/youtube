@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/01/20 v1.34 網羅率をファイルに出力する
-version = "1.34"
+# 25/01/21 v1.35 goodの月平均を追加
+version = "1.35"
 
 debug = 0
 logf = ""
@@ -171,9 +171,13 @@ def output_replay_count2() :
             out.write(f'<td align="right">{video_info[k]}</td><td align="right">{video_info[k]/days:.2f}</td>')
 
         good_rate = good_cnt / video_info['all'] * 100     #  再生回数あたりのgood率
-        out.write(f'<td align="right">{cdatestr}</td>'
-                  f'<td align="right">{good_cnt}</td>'
-                  f'<td align="right">{diff_good}</td><td align="right">{good_rate:.2f}</td></tr>\n')
+        good_per_month =  good_cnt / fromdays * 30
+        out.write(f'<td align="right">{good_cnt}</td>'
+                  f'<td align="right">{diff_good}</td>'
+                  f'<td align="right">{good_rate:.2f}</td>'
+                  f'<td align="right">{good_per_month:.2f}</td>'
+                  f'<td align="right">{cdatestr}</td>'
+                  f'</tr>\n')
 
     csvout.close()
 
