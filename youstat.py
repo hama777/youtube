@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/01/21 v1.35 goodの月平均を追加
-version = "1.35"
+# 25/01/23 v1.36 網羅率を過去分も含めて表示
+version = "1.36"
 
 debug = 0
 logf = ""
@@ -42,6 +42,7 @@ daily_info = {}    # 日別再生回数  キー  日付  値  再生回数
 monthly_info = {}  # 月別再生回数  キー  yymm 値  総再生回数
 mon_data = {}      # 今月のデータ(ランキング用)  キー  日付  値  再生回数  
 year_data = {}       
+coverrate_info = {}  # 網羅率の履歴   キー  日付  値  リスト(日、週、月、3ヶ月 それぞれの網羅率)
 ftp_host = ftp_user = ftp_pass = ftp_url =  ""
 pixela_url = ""
 pixela_token = ""
@@ -52,6 +53,7 @@ def main_proc() :
     read_videoid()
     read_dailydata()
     read_good_data()
+    read_coverrate()
     create_repcount_info()    
     create_daily_info()
     month_count()   
@@ -95,6 +97,16 @@ def read_good_data():
     for id,good  in gooddata.items()  :
         prevf.write(f'{id}\t{good}\n')
     prevf.close()
+
+def read_coverrate() :
+    global coverrate_info
+    cf = open(coverratefile,'r', encoding='utf-8')
+    for line in cf :
+        line = line.strip()
+        data = line.split("\t")
+        datedata =  dt.strptime(data[0], '%y/%m/%d')
+        coverrate_info[datedata] = data[1:] 
+    cf.close()
 
 #   再生回数情報 rep_info を作成する
 #   rep_info 辞書  キー  vid  値  video_info 
@@ -202,8 +214,16 @@ def get_covering_rate() :
 
 #   網羅率の表示
 def covering_rate() :
+    for k,v in coverrate_info.items() :
+        date_str = k.strftime("%y/%m/%d")
+        s = f'<tr><td>{date_str}</td><td align="right">{v[0]}</td><td align="right">{v[1]}</td>' \
+            f'<td align="right">{v[2]}</td><td align="right">{v[3]}</td></tr>\n'
+        out.write(s)
+
     rate = get_covering_rate()
-    s = f"本日: {rate['day']:5.1f}%  今週:{rate['week']:5.1f}%  今月:{rate['mon']:5.1f}%  3ヶ月:{rate['mon3']:5.1f}%"
+    s = f'<tr><td>本日</td><td align="right">{rate['day']:5.1f}</td><td align="right">{rate['week']:5.1f}</td>' \
+        f'<td align="right">{rate['mon']:5.1f}</td><td align="right">{rate['mon3']:5.1f}</td></tr>\n'
+#    s = f"本日: {rate['day']:5.1f}%  今週:{rate['week']:5.1f}%  今月:{rate['mon']:5.1f}%  3ヶ月:{rate['mon3']:5.1f}%"
     out.write(s)
 
     f = open(coverratefile , 'a', encoding='utf-8')
