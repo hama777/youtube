@@ -1,5 +1,5 @@
 <html><head><title>Youtube statistics</title>
-<!-- 25/01/21 v1.35 goodの月平均を追加  -->
+<!-- 25/01/23 v1.36 網羅率を過去分も含めて表示  -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="you.css">
@@ -283,7 +283,12 @@
     </div>
 </div>
 <h2>網羅率</h2>
-%covering_rate%
+<table>
+    <tr>
+        <th>日付</th><th>日</th><th>週</th><th>月</th><th>3ヶ月</th>
+    </tr>
+    %covering_rate%
+</table>
 
 </body>
 </html>
