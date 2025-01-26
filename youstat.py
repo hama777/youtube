@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/01/24 v1.37 引用符でエラーになるのを修正
-version = "1.37"
+# 25/01/26 v1.38 網羅率の日付表示を変更
+version = "1.38"
 
 debug = 0
 logf = ""
@@ -214,14 +214,17 @@ def get_covering_rate() :
 
 #   網羅率の表示
 def covering_rate() :
+    #  ログの日付は前日のものなので日付は前日のものを表示する
     for k,v in coverrate_info.items() :
+        k = k - timedelta(days=1)
         date_str = k.strftime("%y/%m/%d")
         s = f'<tr><td>{date_str}</td><td align="right">{v[0]}</td><td align="right">{v[1]}</td>' \
             f'<td align="right">{v[2]}</td><td align="right">{v[3]}</td></tr>\n'
         out.write(s)
 
     rate = get_covering_rate()
-    s = f"<tr><td>本日</td><td align='right'>{rate['day']:5.1f}</td><td align='right'>{rate['week']:5.1f}</td>" \
+    date_str = yesterday.strftime("%y/%m/%d")
+    s = f"<tr><td>{date_str}</td><td align='right'>{rate['day']:5.1f}</td><td align='right'>{rate['week']:5.1f}</td>" \
         f"<td align='right'>{rate['mon']:5.1f}</td><td align='right'>{rate['mon3']:5.1f}</td></tr>\n"
 #    s = f"本日: {rate['day']:5.1f}%  今週:{rate['week']:5.1f}%  今月:{rate['mon']:5.1f}%  3ヶ月:{rate['mon3']:5.1f}%"
     out.write(s)
