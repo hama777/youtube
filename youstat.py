@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/01/26 v1.38 網羅率の日付表示を変更
-version = "1.38"
+# 25/02/06 v1.39 good に増分がある時は赤字にする
+version = "1.39"
 
 debug = 0
 logf = ""
@@ -184,8 +184,12 @@ def output_replay_count2() :
 
         good_rate = good_cnt / video_info['all'] * 100     #  再生回数あたりのgood率
         good_per_month =  good_cnt / fromdays * 30
+        diff_good_str = str(diff_good)
+        if diff_good >= 1 :                                # good に増分がある時は赤字にする
+            diff_good_str = f'<span class=red>{diff_good}</span>'
+
         out.write(f'<td align="right">{good_cnt}</td>'
-                  f'<td align="right">{diff_good}</td>'
+                  f'<td align="right">{diff_good_str}</td>'
                   f'<td align="right">{good_rate:.2f}</td>'
                   f'<td align="right">{good_per_month:.2f}</td>'
                   f'<td align="right">{cdatestr}</td>'
@@ -214,19 +218,15 @@ def get_covering_rate() :
 
 #   網羅率の表示
 def covering_rate() :
-    #  ログの日付は前日のものなので日付は前日のものを表示する
     for k,v in coverrate_info.items() :
-        k = k - timedelta(days=1)
         date_str = k.strftime("%y/%m/%d")
         s = f'<tr><td>{date_str}</td><td align="right">{v[0]}</td><td align="right">{v[1]}</td>' \
             f'<td align="right">{v[2]}</td><td align="right">{v[3]}</td></tr>\n'
         out.write(s)
 
     rate = get_covering_rate()
-    date_str = yesterday.strftime("%y/%m/%d")
-    s = f"<tr><td>{date_str}</td><td align='right'>{rate['day']:5.1f}</td><td align='right'>{rate['week']:5.1f}</td>" \
+    s = f"<tr><td>本日</td><td align='right'>{rate['day']:5.1f}</td><td align='right'>{rate['week']:5.1f}</td>" \
         f"<td align='right'>{rate['mon']:5.1f}</td><td align='right'>{rate['mon3']:5.1f}</td></tr>\n"
-#    s = f"本日: {rate['day']:5.1f}%  今週:{rate['week']:5.1f}%  今月:{rate['mon']:5.1f}%  3ヶ月:{rate['mon3']:5.1f}%"
     out.write(s)
 
     f = open(coverratefile , 'a', encoding='utf-8')
