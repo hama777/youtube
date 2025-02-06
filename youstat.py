@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/02/06 v1.39 good に増分がある時は赤字にする
-version = "1.39"
+# 25/02/06 v1.40 good に増分がある時は赤字にする , 修正漏れ
+version = "1.40"
 
 debug = 0
 logf = ""
@@ -218,7 +218,9 @@ def get_covering_rate() :
 
 #   網羅率の表示
 def covering_rate() :
+    #  ログの日付は前日のものなので日付は前日のものを表示する
     for k,v in coverrate_info.items() :
+        k = k - timedelta(days=1)
         date_str = k.strftime("%y/%m/%d")
         s = f'<tr><td>{date_str}</td><td align="right">{v[0]}</td><td align="right">{v[1]}</td>' \
             f'<td align="right">{v[2]}</td><td align="right">{v[3]}</td></tr>\n'
