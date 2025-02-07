@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/02/06 v1.40 good に増分がある時は赤字にする , 修正漏れ
-version = "1.40"
+# 25/02/07 v1.41 網羅率表示日付修正
+version = "1.41"
 
 debug = 0
 logf = ""
@@ -227,7 +227,8 @@ def covering_rate() :
         out.write(s)
 
     rate = get_covering_rate()
-    s = f"<tr><td>本日</td><td align='right'>{rate['day']:5.1f}</td><td align='right'>{rate['week']:5.1f}</td>" \
+    d = yesterday.strftime("%y/%m/%d")
+    s = f"<tr><td>{d}</td><td align='right'>{rate['day']:5.1f}</td><td align='right'>{rate['week']:5.1f}</td>" \
         f"<td align='right'>{rate['mon']:5.1f}</td><td align='right'>{rate['mon3']:5.1f}</td></tr>\n"
     out.write(s)
 
