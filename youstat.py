@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/02/07 v1.41 網羅率表示日付修正
-version = "1.41"
+# 25/02/17 v1.42 網羅率出力を別メソッドにする
+version = "1.42"
 
 debug = 0
 logf = ""
@@ -58,6 +58,7 @@ def main_proc() :
     create_daily_info()
     month_count()   
     parse_template()
+    output_covering_rate()
     ftp_upload()
     post_pixela()
 
@@ -213,7 +214,6 @@ def get_covering_rate() :
     for k in key_list :
         rate[k] = cnt[k] / sum * 100
     
-    #print(rate)
     return rate
 
 #   網羅率の表示
@@ -232,6 +232,10 @@ def covering_rate() :
         f"<td align='right'>{rate['mon']:5.1f}</td><td align='right'>{rate['mon3']:5.1f}</td></tr>\n"
     out.write(s)
 
+#   網羅率の出力
+#   TODO： 1日に2回実行したときは出力しないようにする
+def output_covering_rate() :
+    rate = get_covering_rate()
     f = open(coverratefile , 'a', encoding='utf-8')
     d = today_date.strftime("%y/%m/%d")
     s = f"{d}\t{rate['day']:5.1f}\t{rate['week']:5.1f}\t{rate['mon']:5.1f}\t{rate['mon3']:5.1f}\n"
@@ -259,7 +263,6 @@ def top_repcount_com(key) :
         out.write(f"<tr><td>{i}</td><td>{title}</td><td align='right'>{row['repcnt']}</td></tr>\n")
         if i >= n_order :
             break
-
 
 #  日ごとの再生回数を収めた辞書 daily_info を生成する
 def create_daily_info() :
@@ -394,7 +397,6 @@ def rank_common(rankdata,half) :
 
         out.write(f'<tr><td align="right">{i}</td><td>{date_str}</td><td align="right">{cnt}</td></tr>')
 
-
 def post_pixela() :
     if debug == 1 :
         return
@@ -434,7 +436,6 @@ def move_ave_graph(flg) :
             mm = row.date.month
             dd = row.date.day
             out.write(f"['{mm}/{dd}',{row.cnt}],") 
-
 
 def month_count():
     startyy = 2022
