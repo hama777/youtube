@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/02/17 v1.42 網羅率出力を別メソッドにする
-version = "1.42"
+# 25/02/18 v1.43 網羅率表示を2列にする
+version = "1.43"
 
 debug = 0
 logf = ""
@@ -217,20 +217,40 @@ def get_covering_rate() :
     return rate
 
 #   網羅率の表示
-def covering_rate() :
+#   TODO:  直近40日までを表示する
+def covering_rate(col) :
+    n = 0 
     #  ログの日付は前日のものなので日付は前日のものを表示する
     for k,v in coverrate_info.items() :
+        n += 1
+        if multi_col(n,col,20) :
+            continue
         k = k - timedelta(days=1)
         date_str = k.strftime("%y/%m/%d")
         s = f'<tr><td>{date_str}</td><td align="right">{v[0]}</td><td align="right">{v[1]}</td>' \
             f'<td align="right">{v[2]}</td><td align="right">{v[3]}</td></tr>\n'
         out.write(s)
 
+    if col == 1 :
+        return 
     rate = get_covering_rate()
     d = yesterday.strftime("%y/%m/%d")
     s = f"<tr><td>{d}</td><td align='right'>{rate['day']:5.1f}</td><td align='right'>{rate['week']:5.1f}</td>" \
         f"<td align='right'>{rate['mon']:5.1f}</td><td align='right'>{rate['mon3']:5.1f}</td></tr>\n"
     out.write(s)
+
+#   複数カラムの場合の判定
+#     n  ...  何行目か     col ... 何カラム目か   limit .. 何行表示するか
+#     表示しない場合(continueする場合) true を返す
+def multi_col(n,col,limit) :
+    if col == 1 :
+        if n > limit :
+            return True
+    if col == 2 :
+        if n <= limit :
+            return True
+    return False
+
 
 #   網羅率の出力
 #   TODO： 1日に2回実行したときは出力しないようにする
@@ -532,8 +552,11 @@ def parse_template() :
         if "%top_replay_month3%" in line :
             top_repcount_com("mon3")
             continue
-        if "%covering_rate%" in line :
-            covering_rate()
+        if "%covering_rate1%" in line :
+            covering_rate(1)
+            continue
+        if "%covering_rate2%" in line :
+            covering_rate(2)
             continue
         if "%version%" in line :
             s = line.replace("%version%",version)
