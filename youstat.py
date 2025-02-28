@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/02/18 v1.43 網羅率表示を2列にする
-version = "1.43"
+# 25/02/28 v1.44 網羅率グラフ追加
+version = "1.44"
 
 debug = 0
 logf = ""
@@ -261,6 +261,13 @@ def output_covering_rate() :
     s = f"{d}\t{rate['day']:5.1f}\t{rate['week']:5.1f}\t{rate['mon']:5.1f}\t{rate['mon3']:5.1f}\n"
     f.write(s)
     f.close()
+
+#   網羅率グラフ
+def covering_rate_graph() :
+    for k,v in coverrate_info.items() :
+        k = k - timedelta(days=1)
+        date_str = k.strftime("%m/%d")
+        out.write(f"['{date_str}',{v[0]}],") 
 
 #  再生回数 top 
 def output_top_repcount() :
@@ -557,6 +564,9 @@ def parse_template() :
             continue
         if "%covering_rate2%" in line :
             covering_rate(2)
+            continue
+        if "%covering_rate_graph%" in line :
+            covering_rate_graph()
             continue
         if "%version%" in line :
             s = line.replace("%version%",version)
