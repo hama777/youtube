@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/02/28 v1.44 網羅率グラフ追加
-version = "1.44"
+# 25/03/04 v1.45 網羅率グラフに前日分が含まれなかったのを修正
+version = "1.45"
 
 debug = 0
 logf = ""
@@ -268,6 +268,9 @@ def covering_rate_graph() :
         k = k - timedelta(days=1)
         date_str = k.strftime("%m/%d")
         out.write(f"['{date_str}',{v[0]}],") 
+    rate = get_covering_rate()
+    d = yesterday.strftime("%m/%d")
+    out.write(f"['{d}',{rate['day']}],")   #  前日の分は coverrate_info に含まれていないため
 
 #  再生回数 top 
 def output_top_repcount() :
