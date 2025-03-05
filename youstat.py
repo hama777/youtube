@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/03/04 v1.45 網羅率グラフに前日分が含まれなかったのを修正
-version = "1.45"
+# 25/03/05 v1.46 網羅率の表示を直近40日とした
+version = "1.46"
 
 debug = 0
 logf = ""
@@ -220,8 +220,9 @@ def get_covering_rate() :
 #   TODO:  直近40日までを表示する
 def covering_rate(col) :
     n = 0 
+    coverrate_last = dict(list(coverrate_info.items())[-39:])  #  上限40件 今日の分1件を引く
     #  ログの日付は前日のものなので日付は前日のものを表示する
-    for k,v in coverrate_info.items() :
+    for k,v in coverrate_last.items() :
         n += 1
         if multi_col(n,col,20) :
             continue
