@@ -5,10 +5,12 @@ import requests
 import json
 import datetime
 import shutil
+import smtplib
+from email.mime.text import MIMEText
 
-#from apiclient.discovery import build
-
+# 25/03/10 v1.25 メール送信処理準備
 version = "1.25"
+
 logf = ""
 appdir = os.path.dirname(os.path.abspath(__file__))
 logfile = appdir + "\\youtube.log"
@@ -28,6 +30,12 @@ current = {}
 prevdate = ""
 curdate = ""
 dailyf = ""
+SMTP_SERVER = ""
+SMTP_PORT = ""
+TO_EMAIL = ""
+FROM_EMAIL = ""
+USERNAME = ""
+PASSWORD = ""
 
 #  video ID とタイトルの対応表読み込み
 def read_videoid() :
@@ -96,13 +104,31 @@ def report(mes) :
     headers = {'Authorization': 'Bearer ' + line_notify_token}  
     line_notify = requests.post(line_notify_api, data=payload, headers=headers)
 
+def send_email(mes):
+    # メール本文を作成
+    msg = MIMEText(mes, "plain", "utf-8")
+    msg["Subject"] = "Youtube info"
+    msg["From"] = FROM_EMAIL 
+    msg["To"] = TO_EMAIL
+
+    try:
+        # SMTPサーバーに接続
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        ##server.starttls()  # STARTTLSを使用（SSLなし）
+        server.login(USERNAME, PASSWORD)
+        
+        # メール送信
+        server.send_message(msg)
+        server.quit()
+        
+        print("メール送信成功")
+    except Exception as e:
+        print(f"メール送信失敗: {e}")
+
 def main_proc() :
-    global token,api_key,curdate,dailyf,logf
+    global token,api_key,curdate,dailyf
     dailydata_flg = 0      #  1 の時、dailydata を出力する
     err = 0                #  1 の時、エラー
-
-    logf = open(logfile,'a', encoding='utf-8')
-    logf.write(f'{datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")} start \n' )
 
     #  設定ファイル読み込み
     conf = open(conffile, 'r', encoding='utf-8')
@@ -114,17 +140,12 @@ def main_proc() :
     read_current_count()
     read_prevdate()
     shutil.copy(resultf,resultf_org)   
-    # if os.path.exists(resultf_org) :
-    #     os.remove(resultf_org) 
-    # os.rename(resultf, resultf_org)     #  アクセスエラーに備えて結果ファイルバックアップ
     resf = open(resultf,'w', encoding='utf-8')
 
     curdate = datetime.datetime.now().strftime("%Y/%m/%d")
     #   前回実行時と日付が変わったら dailydata を出力する
     if curdate != prevdate :
         dailydata_flg = 1 
-        # if os.path.exists(dailydata_org) :
-        #     os.remove(dailydata_org) 
         shutil.copy(dailydata, dailydata_org)     #  アクセスエラーに備えて結果ファイルバックアップ
         dailyf = open(dailydata,'a', encoding='utf-8')
 
@@ -150,10 +171,7 @@ def main_proc() :
         dailyf.close()
 
     if err == 1 :
-        logf.write(f'{datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")} *** ERROR count = 0  \n' )
         report("ERROR count=0")
-        # if os.path.exists(resultf) :
-        #     os.remove(resultf) 
         shutil.copy(resultf_org, resultf)     
         if dailydata_flg == 1 :
             shutil.copy(dailydata_org,dailydata)
@@ -162,8 +180,6 @@ def main_proc() :
     f = open(datefile,'w', encoding='utf-8')
     f.write(curdate)
     f.close()
-    logf.write(f'{datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")} end \n' )
-    logf.close()
 
 # -------------------------------------------------------------
 main_proc()
