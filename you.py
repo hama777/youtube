@@ -8,8 +8,8 @@ import shutil
 import smtplib
 from email.mime.text import MIMEText
 
-# 25/03/10 v1.25 メール送信処理準備
-version = "1.25"
+# 25/03/19 v1.26 LINEの通知をやめメールで通知する
+version = "1.26"
 
 logf = ""
 appdir = os.path.dirname(os.path.abspath(__file__))
@@ -18,6 +18,7 @@ videoidf = appdir + "\\videoid.txt"
 resultf = appdir + "\\result.txt"
 resultf_org = appdir + "\\result_org.txt"
 conffile = appdir + "\\youtube.conf"
+mail_conffile = appdir + "\\mail.conf"
 datefile = appdir + "\\date.txt"
 dailydata = appdir + "\\dailydata.txt"   # 日々のデータ  形式 yy/mm/dd videoid count  (tab区切り)
 dailydata_org = appdir + "\\dailydata_org.txt"   # バックアップ用
@@ -30,6 +31,7 @@ current = {}
 prevdate = ""
 curdate = ""
 dailyf = ""
+report_mes = ""     # メールする内容
 SMTP_SERVER = ""
 SMTP_PORT = ""
 TO_EMAIL = ""
@@ -73,6 +75,7 @@ def read_prevdate() :
 
 #   現在の値が過去の値よりも増えたら LINE に通知する
 def check_count(id,count,like,comment) :
+    global report_mes
     items = {}
 
     if not id in current:
@@ -84,16 +87,16 @@ def check_count(id,count,like,comment) :
     newcount = oldvalue 
 
     if count > oldvalue :
-        report("Y {} = {}(+{}) ".format(idlist[id],count,count-oldvalue))  
+        report_mes += f"{idlist[id]} = {count}(+{count-oldvalue})\n"
         newcount = count
     oldvalue = items['like']
     newlike = oldvalue
     if like > oldvalue :
-        report("Youtube {} like = {} ".format(idlist[id],like))  
+        report_mes += f"{idlist[id]} like = {like}\n"
         newlike = like
     oldvalue = items['comment']
     if comment != oldvalue :
-        report("Youtube {} comment = {} ".format(idlist[id],comment))  
+        report_mes += f"{idlist[id]} comment = {comment}\n"
     return newcount,newlike
 
 def report(mes) :
@@ -107,8 +110,8 @@ def report(mes) :
 def send_email(mes):
     # メール本文を作成
     msg = MIMEText(mes, "plain", "utf-8")
-    msg["Subject"] = "Youtube info"
-    msg["From"] = FROM_EMAIL 
+    msg["Subject"] = "<< Youtube info >>"
+    msg["From"] = USERNAME
     msg["To"] = TO_EMAIL
 
     try:
@@ -127,6 +130,7 @@ def send_email(mes):
 
 def main_proc() :
     global token,api_key,curdate,dailyf
+    global SMTP_SERVER,USERNAME,PASSWORD,SMTP_PORT,TO_EMAIL
     dailydata_flg = 0      #  1 の時、dailydata を出力する
     err = 0                #  1 の時、エラー
 
@@ -135,7 +139,16 @@ def main_proc() :
     api_key  = conf.readline().strip()
     token = conf.readline().strip()
     conf.close()
-    
+
+    conf = open(mail_conffile, 'r', encoding='utf-8')
+    SMTP_SERVER  = conf.readline().strip()
+    USERNAME  = conf.readline().strip()
+    PASSWORD  = conf.readline().strip()
+    SMTP_PORT  = conf.readline().strip()
+    TO_EMAIL  = conf.readline().strip()
+    conf.close()
+
+
     read_videoid()
     read_current_count()
     read_prevdate()
@@ -171,11 +184,14 @@ def main_proc() :
         dailyf.close()
 
     if err == 1 :
-        report("ERROR count=0")
+        #report("ERROR count=0")
         shutil.copy(resultf_org, resultf)     
         if dailydata_flg == 1 :
             shutil.copy(dailydata_org,dailydata)
         return
+
+    if report_mes != "" :
+        send_email(report_mes)
 
     f = open(datefile,'w', encoding='utf-8')
     f.write(curdate)
