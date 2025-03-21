@@ -8,12 +8,12 @@ import shutil
 import smtplib
 from email.mime.text import MIMEText
 
-# 25/03/19 v1.26 LINEの通知をやめメールで通知する
-version = "1.26"
+# 25/03/21 v1.27 LINEの通知廃止
+version = "1.27"
 
 logf = ""
 appdir = os.path.dirname(os.path.abspath(__file__))
-logfile = appdir + "\\youtube.log"
+#logfile = appdir + "\\youtube.log"
 videoidf = appdir + "\\videoid.txt"
 resultf = appdir + "\\result.txt"
 resultf_org = appdir + "\\result_org.txt"
@@ -99,13 +99,12 @@ def check_count(id,count,like,comment) :
         report_mes += f"{idlist[id]} comment = {comment}\n"
     return newcount,newlike
 
-def report(mes) :
-#    logf.write("report \n")
-    line_notify_token = token
-    line_notify_api = 'https://notify-api.line.me/api/notify'
-    payload = {'message': mes}
-    headers = {'Authorization': 'Bearer ' + line_notify_token}  
-    line_notify = requests.post(line_notify_api, data=payload, headers=headers)
+# def report(mes) :
+#     line_notify_token = token
+#     line_notify_api = 'https://notify-api.line.me/api/notify'
+#     payload = {'message': mes}
+#     headers = {'Authorization': 'Bearer ' + line_notify_token}  
+#     line_notify = requests.post(line_notify_api, data=payload, headers=headers)
 
 def send_email(mes):
     # メール本文を作成
@@ -124,7 +123,6 @@ def send_email(mes):
         server.send_message(msg)
         server.quit()
         
-        print("メール送信成功")
     except Exception as e:
         print(f"メール送信失敗: {e}")
 
@@ -137,17 +135,15 @@ def main_proc() :
     #  設定ファイル読み込み
     conf = open(conffile, 'r', encoding='utf-8')
     api_key  = conf.readline().strip()
-    token = conf.readline().strip()
-    conf.close()
+    # token = conf.readline().strip()
 
-    conf = open(mail_conffile, 'r', encoding='utf-8')
+    #  メール設定情報の読み込み
     SMTP_SERVER  = conf.readline().strip()
     USERNAME  = conf.readline().strip()
     PASSWORD  = conf.readline().strip()
     SMTP_PORT  = conf.readline().strip()
     TO_EMAIL  = conf.readline().strip()
     conf.close()
-
 
     read_videoid()
     read_current_count()
@@ -184,7 +180,7 @@ def main_proc() :
         dailyf.close()
 
     if err == 1 :
-        #report("ERROR count=0")
+        send_email("Youtube data access error")
         shutil.copy(resultf_org, resultf)     
         if dailydata_flg == 1 :
             shutil.copy(dailydata_org,dailydata)
@@ -199,4 +195,3 @@ def main_proc() :
 
 # -------------------------------------------------------------
 main_proc()
-
