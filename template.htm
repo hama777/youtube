@@ -1,5 +1,7 @@
-<html><head><title>Youtube statistics</title>
-<!-- 25/02/28 v1.44 網羅率グラフ追加 -->
+<html>
+<head>
+<title>Youtube statistics</title>
+<!-- 25/04/10 再生回数テーブルをソートできるようにした -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="you.css">
@@ -155,25 +157,25 @@
 <div id="daily_graph" style="width:800px; height:300px;  margin-top:20px ; margin-left:  50px; " ></div>
 <br>
 <h2>再生回数</h2>
-<table>
-<tr>
-<th></th><th>日集計</th><th colspan="2">週集計</th><th colspan="2">月集計</th>
-<th colspan="2">3ヶ月集計</th>
-<th colspan="2">総集計</th>
-<th colspan="4">good</th><th></th>
-</tr>
-
-<tr>
-<th>タイトル</th><th>回数</th>
-<th>　回数</th><th>　平均</th>
-<th>　回数</th><th>　平均</th>
-<th>　回数</th><th>　平均</th>
-<th>　回数</th><th>　平均</th>
-<th>件数</th><th>増分</th><th>率</th><th>月平均</th><th>登録日</th>
-</tr>
-%replay_table
+<table id="myTable">
+    <thead>
+        <tr>
+            <th></th><th>日集計</th><th colspan="2">週集計</th><th colspan="2">月集計</th>
+            <th colspan="2">3ヶ月集計</th><th colspan="2">総集計</th>
+            <th colspan="4">good</th><th></th>
+        </tr>
+        <tr>
+            <th>タイトル</th><th>回数</th><th>　回数</th><th>　平均</th>
+            <th>　回数</th><th>　平均</th><th>　回数</th><th>　平均</th>
+            <th>　回数</th><th>　平均</th><th>件数</th><th>増分</th><th>率</th><th>月平均</th><th>登録日</th>
+        </tr>
+    </thead>
+    <tbody>
+        %replay_table
+    </tbody>
 </table>
 <br>
+
 <h2>タイトル別再生回数Top</h2>
 <div class="flex">
     <div >
@@ -320,6 +322,48 @@
 <h2>網羅率グラフ</h2>
 <div id="covering_rate_graph" style="width:800px; height:400px;  margin-top:20px ; margin-left:  50px; " ></div>
 
+<script>
+    const table = document.getElementById("myTable");
+    const headerRows = table.querySelectorAll("thead tr");
+    const secondHeaderCells = headerRows[1].querySelectorAll("th");
+  
+    let sortColumn = -1;
+    let sortDirection = 0; // 1: 昇順, -1: 降順
+  
+    secondHeaderCells.forEach((header, index) => {
+      header.addEventListener("click", () => {
+        // ソート対象の列インデックス
+        if (sortColumn === index) {
+    sortDirection *= -1; // クリックを繰り返したときの切り替え
+  } else {
+    sortColumn = index;
+    sortDirection = -1; // ← 最初のクリックで降順になるよう明示的に指定
+  }
+  
+        // ソート状態のリセット
+        secondHeaderCells.forEach(h => h.classList.remove("sorted-asc", "sorted-desc"));
+        header.classList.add(sortDirection === 1 ? "sorted-asc" : "sorted-desc");
+  
+        const tbody = table.querySelector("tbody");
+        const rows = Array.from(tbody.querySelectorAll("tr"));
+  
+        rows.sort((a, b) => {
+          const cellA = a.children[sortColumn].textContent.trim();
+          const cellB = b.children[sortColumn].textContent.trim();
+  
+          const valA = isNaN(cellA) ? cellA : parseFloat(cellA);
+          const valB = isNaN(cellB) ? cellB : parseFloat(cellB);
+  
+          if (valA < valB) return -1 * sortDirection;
+          if (valA > valB) return 1 * sortDirection;
+          return 0;
+        });
+  
+        // 並べ替えた行を再追加
+        rows.forEach(row => tbody.appendChild(row));
+      });
+    });
+  </script>
 
 
 </body>
