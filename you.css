@@ -1,4 +1,4 @@
-/*  コメント */
+/*  25/04/10 再生回数テーブルをソートできるようにした  */
 table, td, th { 
     font-family: "Meiryo UI" ; 
     font-size: 14px; 
@@ -60,4 +60,10 @@ td.right{
 }
 span.red {
     color : red;
+}
+th.sorted-asc::after {
+    content: " ▲";
+}
+th.sorted-desc::after {
+    content: " ▼";
 }
