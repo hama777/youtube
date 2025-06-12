@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>Youtube statistics</title>
-<!-- 25/04/10 再生回数テーブルをソートできるようにした -->
+<!-- 25/06/12 v1.45 月別再生回数ランキング追加 -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="you.css">
@@ -234,6 +234,26 @@
 
 <h2>月別平均再生回数</h2>
 <div id="monthly_graph" style="width:800px; height:400px;  margin-top:20px ; margin-left:  50px; " ></div>
+
+<h2>月別再生回数ランキング</h2>
+<div class="flex">
+    <div class='frame'>
+        <span style="margin-left: 30px;">Top</span>
+        <table class="rank">
+        <tr><th>順位</th><th>年月</th><th>回数</th></tr>
+        %month_rank_top%
+        </table>
+    </div>
+    <div class='frame'>
+        <span style="margin-left: 30px;">Low</span>
+        <table class="rank">
+        <tr><th>順位</th><th>年月</th><th>回数</th></tr>
+        %month_rank_low%
+        </table>
+    </div>
+</div>
+<br>
+
 <h2>状況</h2>
 <iframe src="https://pixe.la/v1/users/hama777/graphs/youtube?mode=simple" height="155" width="720" frameborder="0">
 </iframe>
