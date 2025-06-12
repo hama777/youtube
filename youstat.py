@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/03/05 v1.46 網羅率の表示を直近40日とした
-version = "1.46"
+# 25/06/12 v1.45 月別再生回数ランキング追加
+version = "1.45"
 
 debug = 0
 logf = ""
@@ -501,6 +501,22 @@ def month_graph() :
     for chk_date,cnt in monthly_info.items() :
         out.write(f"['{chk_date}',{cnt}],") 
 
+#   月別再生回数ランキング  flg 1  TOP  2  Low
+def month_rank(flg) :
+    sortflg = True
+    if flg == 2 :
+        sortflg = False
+
+    rank = {}
+    rank = sorted(monthly_info.items(), key=lambda x:x[1],reverse=sortflg)
+    rank = dict((x, y) for x, y in rank)
+    n = 0 
+    for yymm,val in rank.items() :
+        n += 1
+        out.write(f'<tr><td>{n}</td><td>{yymm}</td><td>{val:5.2f}</td></tr>\n')
+        if n >= 7 :
+            break
+
 def parse_template() :
     global out 
     f = open(templatefile , 'r', encoding='utf-8')
@@ -571,6 +587,12 @@ def parse_template() :
             continue
         if "%covering_rate_graph%" in line :
             covering_rate_graph()
+            continue
+        if "%month_rank_top%" in line :
+            month_rank(1)
+            continue
+        if "%month_rank_low%" in line :
+            month_rank(2)
             continue
         if "%version%" in line :
             s = line.replace("%version%",version)
