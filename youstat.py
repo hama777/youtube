@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/06/12 v1.45 月別再生回数ランキング追加
-version = "1.45"
+# 25/06/13 v1.46 月別再生回数ランキングの今月を赤字にした
+version = "1.46"
 
 debug = 0
 logf = ""
@@ -513,8 +513,12 @@ def month_rank(flg) :
     n = 0 
     for yymm,val in rank.items() :
         n += 1
-        out.write(f'<tr><td>{n}</td><td>{yymm}</td><td>{val:5.2f}</td></tr>\n')
-        if n >= 7 :
+        str_yymm = yymm
+        if yymm == today_yy * 100 + today_mm :
+            str_yymm = f'<span class=red>{yymm}</span>'
+
+        out.write(f'<tr><td align="right">{n}</td><td>{str_yymm}</td><td align="right">{val:5.2f}</td></tr>\n')
+        if n >= 10 :
             break
 
 def parse_template() :
