@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/06/14 v1.47 月別再生回数ランキングで年の処理を修正
-version = "1.47"
+# 25/07/08 v1.48 網羅率グラフの期間を120日間とした
+version = "1.48"
 
 debug = 0
 logf = ""
@@ -265,7 +265,8 @@ def output_covering_rate() :
 
 #   網羅率グラフ
 def covering_rate_graph() :
-    for k,v in coverrate_info.items() :
+    coverrate_last = dict(list(coverrate_info.items())[-119:])  #  上限120件 今日の分1件を引く
+    for k,v in coverrate_last.items() :
         k = k - timedelta(days=1)
         date_str = k.strftime("%m/%d")
         out.write(f"['{date_str}',{v[0]}],") 
