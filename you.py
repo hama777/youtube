@@ -8,8 +8,8 @@ import shutil
 import smtplib
 from email.mime.text import MIMEText
 
-# 25/03/21 v1.27 LINEの通知廃止
-version = "1.27"
+# 25/07/29 v1.28 増分の合計を表示
+version = "1.28"
 
 logf = ""
 appdir = os.path.dirname(os.path.abspath(__file__))
@@ -75,7 +75,7 @@ def read_prevdate() :
 
 #   現在の値が過去の値よりも増えたら LINE に通知する
 def check_count(id,count,like,comment) :
-    global report_mes
+    global report_mes,all_count
     items = {}
 
     if not id in current:
@@ -87,8 +87,10 @@ def check_count(id,count,like,comment) :
     newcount = oldvalue 
 
     if count > oldvalue :
-        report_mes += f"{idlist[id]} = {count}(+{count-oldvalue})\n"
+        diff = count-oldvalue
+        report_mes += f"{idlist[id]} = {count}(+{diff})\n"
         newcount = count
+        all_count += diff
     oldvalue = items['like']
     newlike = oldvalue
     if like > oldvalue :
@@ -98,13 +100,6 @@ def check_count(id,count,like,comment) :
     if comment != oldvalue :
         report_mes += f"{idlist[id]} comment = {comment}\n"
     return newcount,newlike
-
-# def report(mes) :
-#     line_notify_token = token
-#     line_notify_api = 'https://notify-api.line.me/api/notify'
-#     payload = {'message': mes}
-#     headers = {'Authorization': 'Bearer ' + line_notify_token}  
-#     line_notify = requests.post(line_notify_api, data=payload, headers=headers)
 
 def send_email(mes):
     # メール本文を作成
@@ -127,11 +122,12 @@ def send_email(mes):
         print(f"メール送信失敗: {e}")
 
 def main_proc() :
-    global token,api_key,curdate,dailyf
+    global token,api_key,curdate,dailyf,all_count,report_mes
     global SMTP_SERVER,USERNAME,PASSWORD,SMTP_PORT,TO_EMAIL
     dailydata_flg = 0      #  1 の時、dailydata を出力する
     err = 0                #  1 の時、エラー
-
+    all_count = 0          #  増分の合計
+    report_mes = ""     # メールする内容
     #  設定ファイル読み込み
     conf = open(conffile, 'r', encoding='utf-8')
     api_key  = conf.readline().strip()
@@ -187,6 +183,8 @@ def main_proc() :
         return
 
     if report_mes != "" :
+        report_mes += f'増分合計 = {all_count}\n'
+        print(report_mes)
         send_email(report_mes)
 
     f = open(datefile,'w', encoding='utf-8')
