@@ -8,8 +8,8 @@ import shutil
 import smtplib
 from email.mime.text import MIMEText
 
-# 25/07/29 v1.28 増分の合計を表示
-version = "1.28"
+# 25/09/01 v1.29 videoidに自作フラフ追加
+version = "1.29"
 
 logf = ""
 appdir = os.path.dirname(os.path.abspath(__file__))
@@ -45,7 +45,7 @@ def read_videoid() :
     idf = open(videoidf,'r', encoding='utf-8')
     for line in idf :
         line = line.strip()
-        id,title,cdate = line.split("\t")
+        id,title,cdate,self_made = line.split("\t")
         idlist[id] = title
     idf.close()
 
@@ -122,12 +122,12 @@ def send_email(mes):
         print(f"メール送信失敗: {e}")
 
 def main_proc() :
-    global token,api_key,curdate,dailyf,all_count,report_mes
+    global token,api_key,curdate,dailyf,all_count
     global SMTP_SERVER,USERNAME,PASSWORD,SMTP_PORT,TO_EMAIL
     dailydata_flg = 0      #  1 の時、dailydata を出力する
     err = 0                #  1 の時、エラー
     all_count = 0          #  増分の合計
-    report_mes = ""     # メールする内容
+
     #  設定ファイル読み込み
     conf = open(conffile, 'r', encoding='utf-8')
     api_key  = conf.readline().strip()
@@ -183,8 +183,7 @@ def main_proc() :
         return
 
     if report_mes != "" :
-        report_mes += f'増分合計 = {all_count}\n'
-        print(report_mes)
+        report_mes += f'合計 = {all_count}\n'
         send_email(report_mes)
 
     f = open(datefile,'w', encoding='utf-8')
