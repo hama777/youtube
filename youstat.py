@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/09/01 v1.49 videoidに自作フラフ追加
-version = "1.49"
+# 25/09/02 v1.50 バグ修正
+version = "1.50"
 
 debug = 0
 logf = ""
@@ -27,6 +27,7 @@ csvfile = appdir + "./replay.csv"
 
 idlist = {}       # キー videoid  値  タイトル
 cdatelist = {}    # キー videoid  値  動画登録日
+selflist = {}     # キー videoid  値  0 自作   1 その他
 gooddata = {}     # キー videoid  値  good の件数  
 prev_gooddata = {} # キー videoid  値  good の件数  
 current = {}
