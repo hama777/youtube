@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/07/08 v1.48 網羅率グラフの期間を120日間とした
-version = "1.48"
+# 25/09/01 v1.49 videoidに自作フラフ追加
+version = "1.49"
 
 debug = 0
 logf = ""
@@ -63,14 +63,16 @@ def main_proc() :
     post_pixela()
 
 #  video ID とタイトルの対応表読み込み
+#     self_made は 0  自作  1  編曲
 def read_videoid() :
-    global idlist,cdatelist
+    global idlist,cdatelist,selflist
     idf = open(videoidf,'r', encoding='utf-8')
     for line in idf :
         line = line.strip()
-        id,title,cdate = line.split("\t")
+        id,title,cdate,self_made = line.split("\t")
         idlist[id] = title
         cdatelist[id] = cdate
+        selflist[id] = self_made
     idf.close()
 
 def read_dailydata() :
