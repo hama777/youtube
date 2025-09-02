@@ -8,8 +8,8 @@ import shutil
 import smtplib
 from email.mime.text import MIMEText
 
-# 25/09/01 v1.29 videoidに自作フラフ追加
-version = "1.29"
+# 25/09/02 v1.30 デグレード修正
+version = "1.30"
 
 logf = ""
 appdir = os.path.dirname(os.path.abspath(__file__))
@@ -122,11 +122,12 @@ def send_email(mes):
         print(f"メール送信失敗: {e}")
 
 def main_proc() :
-    global token,api_key,curdate,dailyf,all_count
+    global token,api_key,curdate,dailyf,all_count,report_mes
     global SMTP_SERVER,USERNAME,PASSWORD,SMTP_PORT,TO_EMAIL
     dailydata_flg = 0      #  1 の時、dailydata を出力する
     err = 0                #  1 の時、エラー
     all_count = 0          #  増分の合計
+    report_mes = ""     # メールする内容
 
     #  設定ファイル読み込み
     conf = open(conffile, 'r', encoding='utf-8')
@@ -183,7 +184,7 @@ def main_proc() :
         return
 
     if report_mes != "" :
-        report_mes += f'合計 = {all_count}\n'
+        report_mes += f'増分合計 = {all_count}\n'
         send_email(report_mes)
 
     f = open(datefile,'w', encoding='utf-8')
