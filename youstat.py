@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/09/02 v1.50 バグ修正
-version = "1.50"
+# 25/09/04 v1.51 output_selfmade_replay_count 作成中
+version = "1.51"
 
 debug = 0
 logf = ""
@@ -59,6 +59,7 @@ def main_proc() :
     create_daily_info()
     month_count()   
     parse_template()
+    output_selfmade_replay_count()  #  temp
     output_covering_rate()
     ftp_upload()
     post_pixela()
@@ -73,7 +74,7 @@ def read_videoid() :
         id,title,cdate,self_made = line.split("\t")
         idlist[id] = title
         cdatelist[id] = cdate
-        selflist[id] = self_made
+        selflist[id] = int(self_made)
     idf.close()
 
 def read_dailydata() :
@@ -200,6 +201,18 @@ def output_replay_count2() :
                   f'</tr>\n')
 
     csvout.close()
+
+#   自作曲 再生回数
+def output_selfmade_replay_count() :
+    count = 0 
+    week_count = 0 
+    for vid,video_info in rep_info.items() :
+        if selflist[vid] != 0 :
+            continue
+        count += video_info["day"]
+        week_count += video_info["week"]
+
+    #print(count,week_count)    
 
 #   網羅率を取得する
 def get_covering_rate() :
