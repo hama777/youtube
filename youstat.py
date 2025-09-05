@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/09/04 v1.51 output_selfmade_replay_count 作成中
-version = "1.51"
+# 25/09/05 v1.52 自作曲集計テーブル追加
+version = "1.52"
 
 debug = 0
 logf = ""
@@ -59,7 +59,6 @@ def main_proc() :
     create_daily_info()
     month_count()   
     parse_template()
-    output_selfmade_replay_count()  #  temp
     output_covering_rate()
     ftp_upload()
     post_pixela()
@@ -203,16 +202,21 @@ def output_replay_count2() :
     csvout.close()
 
 #   自作曲 再生回数
-def output_selfmade_replay_count() :
-    count = 0 
-    week_count = 0 
+def selfmade_table() :
+    day = 0 
+    week = 0 
+    mon = 0 
+    mon3 = 0
     for vid,video_info in rep_info.items() :
         if selflist[vid] != 0 :
             continue
-        count += video_info["day"]
-        week_count += video_info["week"]
+        day += video_info["day"]
+        week += video_info["week"]
+        mon += video_info["mon"]
+        mon3 += video_info["mon3"]
 
     #print(count,week_count)    
+    out.write(f'<tr><td>{day}</td><td>{week}</td><td>{mon}</td><td>{mon3}</td></tr>\n')
 
 #   網羅率を取得する
 def get_covering_rate() :
@@ -614,6 +618,9 @@ def parse_template() :
             continue
         if "%month_rank_low%" in line :
             month_rank(2)
+            continue
+        if "%selfmade_table%" in line :
+            selfmade_table()
             continue
         if "%version%" in line :
             s = line.replace("%version%",version)
