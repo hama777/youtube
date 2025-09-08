@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/09/05 v1.52 自作曲集計テーブル追加
-version = "1.52"
+# 25/09/08 v1.53 自作曲集計テーブルに割合を追加
+version = "1.53"
 
 debug = 0
 logf = ""
@@ -207,7 +207,12 @@ def selfmade_table() :
     week = 0 
     mon = 0 
     mon3 = 0
+    all_day = all_week = all_mon = all_mon3 = 0
     for vid,video_info in rep_info.items() :
+        all_day += video_info["day"]
+        all_week += video_info["week"]
+        all_mon += video_info["mon"]
+        all_mon3 += video_info["mon3"]
         if selflist[vid] != 0 :
             continue
         day += video_info["day"]
@@ -216,7 +221,11 @@ def selfmade_table() :
         mon3 += video_info["mon3"]
 
     #print(count,week_count)    
-    out.write(f'<tr><td>{day}</td><td>{week}</td><td>{mon}</td><td>{mon3}</td></tr>\n')
+    day_rate = day / all_day * 100
+    week_rate = week / all_week * 100
+    mon_rate = mon / all_mon * 100
+    mon3_rate = mon3 / all_mon3 * 100
+    out.write(f'<tr><td>{day}({day_rate:.2f}%)</td><td>{week}({week_rate:.2f}%)</td><td>{mon}({mon_rate:.2f}%)</td><td>{mon3}({mon3_rate:.2f}%)</td></tr>\n')
 
 #   網羅率を取得する
 def get_covering_rate() :
