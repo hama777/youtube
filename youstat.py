@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/09/08 v1.53 自作曲集計テーブルに割合を追加
-version = "1.53"
+# 25/09/09 v1.54 自作曲集計結果をファイルに保存
+version = "1.54"
 
 debug = 0
 logf = ""
@@ -24,6 +24,7 @@ goodfile = appdir + "./result.txt"    # good の件数取得
 prev_goodfile = appdir + "./prevgood.txt"    # 前回のgood件数 
 coverratefile = appdir + "./coverrate.txt" 
 csvfile = appdir + "./replay.csv" 
+selfmadefile = appdir + "./seftmade.txt"   # 自作曲の日々のリプライ数を保存する
 
 idlist = {}       # キー videoid  値  タイトル
 cdatelist = {}    # キー videoid  値  動画登録日
@@ -226,6 +227,11 @@ def selfmade_table() :
     mon_rate = mon / all_mon * 100
     mon3_rate = mon3 / all_mon3 * 100
     out.write(f'<tr><td>{day}({day_rate:.2f}%)</td><td>{week}({week_rate:.2f}%)</td><td>{mon}({mon_rate:.2f}%)</td><td>{mon3}({mon3_rate:.2f}%)</td></tr>\n')
+
+    f = open(selfmadefile,'a', encoding='utf-8')
+    date_str = today_date.strftime("%y/%m/%d")
+    f.write(f'{date_str}\t{day}\t{week}\t{mon}\t{mon3}\t{day_rate:.2f}\t{week_rate:.2f}\t{mon_rate:.2f}\t{mon3_rate:.2f}\n')
+    f.close()
 
 #   網羅率を取得する
 def get_covering_rate() :
