@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/09/09 v1.54 自作曲集計結果をファイルに保存
-version = "1.54"
+# 25/09/12 v1.55 自作曲集計結果を時系列に表示
+version = "1.55"
 
 debug = 0
 logf = ""
@@ -56,6 +56,7 @@ def main_proc() :
     read_dailydata()
     read_good_data()
     read_coverrate()
+    read_selfmade_data()
     create_repcount_info()    
     create_daily_info()
     month_count()   
@@ -202,8 +203,39 @@ def output_replay_count2() :
 
     csvout.close()
 
+def read_selfmade_data() :
+    global df_selfmade
+    # 読み込み時のカラム名を指定
+    col_names = ["se_date", "d_cnt", "w_cnt", "m_cnt", "q_cnt",
+                "d_rate", "w_rate", "m_rate", "q_rate"]
+
+    # ファイル読み込み（タブ区切り）
+    df_selfmade = pd.read_csv(
+        selfmadefile,
+        sep="\t",
+        header=None,        # ヘッダ行がない場合
+        names=col_names,    # カラム名を指定
+        dtype={             # int/float列の型を指定
+            "d_cnt": int, "w_cnt": int, "m_cnt": int, "q_cnt": int,
+            "d_rate": float, "w_rate": float, "m_rate": float, "q_rate": float,
+        },
+        parse_dates=["se_date"],     # se_date を日付として読み込み
+        date_parser=lambda x: pd.to_datetime(x, format="%y/%m/%d")
+    )
+
+    #print(df_selfmade.dtypes)
+    #print(df_selfmade.head())
+
+def output_pastdata() :
+    for index,row in df_selfmade.iterrows():
+        date_str = row['se_date'].strftime("%y/%m/%d")
+        out.write(f'<tr><td>{date_str}</td><td>{row["d_cnt"]}({row["d_rate"]:.2f}%)</td>'
+                  f'<td>{row["w_cnt"]}({row["w_rate"]:.2f}%)</td>'
+                  f'<td>{row["m_cnt"]}({row["m_rate"]:.2f}%)</td><td>{row["q_cnt"]}({row["q_rate"]:.2f}%)</td></tr>\n')
+
 #   自作曲 再生回数
 def selfmade_table() :
+    output_pastdata()
     day = 0 
     week = 0 
     mon = 0 
@@ -226,7 +258,8 @@ def selfmade_table() :
     week_rate = week / all_week * 100
     mon_rate = mon / all_mon * 100
     mon3_rate = mon3 / all_mon3 * 100
-    out.write(f'<tr><td>{day}({day_rate:.2f}%)</td><td>{week}({week_rate:.2f}%)</td><td>{mon}({mon_rate:.2f}%)</td><td>{mon3}({mon3_rate:.2f}%)</td></tr>\n')
+    out.write(f'<tr><td>本日</td><td>{day}({day_rate:.2f}%)</td><td>{week}({week_rate:.2f}%)</td>'
+              f'<td>{mon}({mon_rate:.2f}%)</td><td>{mon3}({mon3_rate:.2f}%)</td></tr>\n')
 
     f = open(selfmadefile,'a', encoding='utf-8')
     date_str = today_date.strftime("%y/%m/%d")
