@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/09/12 v1.55 自作曲集計結果を時系列に表示
-version = "1.55"
+# 25/09/17 v1.56 自作曲集計の日付を修正
+version = "1.56"
 
 debug = 0
 logf = ""
@@ -228,7 +228,9 @@ def read_selfmade_data() :
 
 def output_pastdata() :
     for index,row in df_selfmade.iterrows():
-        date_str = row['se_date'].strftime("%y/%m/%d")
+        d = row['se_date']
+        d = d - timedelta(days=1)     # 実際の日付と1日ずれているので -1 日する
+        date_str = d.strftime("%m/%d")
         out.write(f'<tr><td>{date_str}</td><td>{row["d_cnt"]}({row["d_rate"]:.2f}%)</td>'
                   f'<td>{row["w_cnt"]}({row["w_rate"]:.2f}%)</td>'
                   f'<td>{row["m_cnt"]}({row["m_rate"]:.2f}%)</td><td>{row["q_cnt"]}({row["q_rate"]:.2f}%)</td></tr>\n')
@@ -258,7 +260,8 @@ def selfmade_table() :
     week_rate = week / all_week * 100
     mon_rate = mon / all_mon * 100
     mon3_rate = mon3 / all_mon3 * 100
-    out.write(f'<tr><td>本日</td><td>{day}({day_rate:.2f}%)</td><td>{week}({week_rate:.2f}%)</td>'
+    d = yesterday.strftime("%m/%d")
+    out.write(f'<tr><td>{d}</td><td>{day}({day_rate:.2f}%)</td><td>{week}({week_rate:.2f}%)</td>'
               f'<td>{mon}({mon_rate:.2f}%)</td><td>{mon3}({mon3_rate:.2f}%)</td></tr>\n')
 
     f = open(selfmadefile,'a', encoding='utf-8')
