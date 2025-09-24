@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/09/17 v1.56 自作曲集計の日付を修正
-version = "1.56"
+# 25/09/24 v1.57 自作曲集計の割合を別欄にした
+version = "1.57"
 
 debug = 0
 logf = ""
@@ -226,14 +226,16 @@ def read_selfmade_data() :
     #print(df_selfmade.dtypes)
     #print(df_selfmade.head())
 
+#   自作曲 過去分表示
 def output_pastdata() :
     for index,row in df_selfmade.iterrows():
         d = row['se_date']
         d = d - timedelta(days=1)     # 実際の日付と1日ずれているので -1 日する
         date_str = d.strftime("%m/%d")
-        out.write(f'<tr><td>{date_str}</td><td>{row["d_cnt"]}({row["d_rate"]:.2f}%)</td>'
-                  f'<td>{row["w_cnt"]}({row["w_rate"]:.2f}%)</td>'
-                  f'<td>{row["m_cnt"]}({row["m_rate"]:.2f}%)</td><td>{row["q_cnt"]}({row["q_rate"]:.2f}%)</td></tr>\n')
+        out.write(f'<tr><td>{date_str}</td><td align="right">{row["d_cnt"]}</td><td align="right">{row["d_rate"]:.1f}%</td>'
+                  f'<td align="right">{row["w_cnt"]}</td><td align="right">{row["w_rate"]:.1f}%</td>'
+                  f'<td align="right">{row["m_cnt"]}</td><td align="right">{row["m_rate"]:.1f}%</td>'
+                  f'<td align="right">{row["q_cnt"]}</td><td align="right">{row["q_rate"]:.1f}%</td></tr>\n')
 
 #   自作曲 再生回数
 def selfmade_table() :
@@ -261,8 +263,10 @@ def selfmade_table() :
     mon_rate = mon / all_mon * 100
     mon3_rate = mon3 / all_mon3 * 100
     d = yesterday.strftime("%m/%d")
-    out.write(f'<tr><td>{d}</td><td>{day}({day_rate:.2f}%)</td><td>{week}({week_rate:.2f}%)</td>'
-              f'<td>{mon}({mon_rate:.2f}%)</td><td>{mon3}({mon3_rate:.2f}%)</td></tr>\n')
+    out.write(f'<tr><td>{d}</td><td align="right">{day}</td><td align="right">{day_rate:.1f}%</td>'
+              f'<td align="right">{week}</td><td align="right">{week_rate:.1f}%</td>'
+              f'<td align="right">{mon}</td><td align="right">{mon_rate:.1f}%</td>'
+              f'<td align="right">{mon3}</td><td align="right">{mon3_rate:.1f}%</td></tr>\n')
 
     f = open(selfmadefile,'a', encoding='utf-8')
     date_str = today_date.strftime("%y/%m/%d")
