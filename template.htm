@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>Youtube statistics</title>
-<!-- 25/09/24 v1.57 自作曲集計の割合を別欄にした -->
+<!-- 25/10/02 v1.58 自作曲集計の表示を2列にする -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="you.css">
@@ -217,10 +217,22 @@
 </div>
 <br>
 <h2>自作曲集計</h2>
-<table>
-    <th>日付</th><th>日</th><th>日割合</th><th>週</th><th>週割合</th><th>月</th><th>月割合</th><th>3ヶ月</th><th>3ヶ月割合</th>
-    %selfmade_table%
-</table>
+<div class="flex">
+    <div>
+        <table>
+            <th>日付</th><th>日</th><th>日割合</th><th>週</th><th>週割合</th><th>月</th><th>月割合</th><th>3ヶ月</th><th>3ヶ月割合</th>
+            %selfmade_table1%
+        </table>
+    </div>
+    <div>
+        <table>
+            <th>日付</th><th>日</th><th>日割合</th><th>週</th><th>週割合</th><th>月</th><th>月割合</th><th>3ヶ月</th><th>3ヶ月割合</th>
+            %selfmade_table2%
+        </table>
+    </div>
+</div>
+
+
 <br>
 <h2>日別再生移動平均</h2>
 <div class="flex">
