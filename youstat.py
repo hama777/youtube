@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/09/24 v1.57 自作曲集計の割合を別欄にした
-version = "1.57"
+# 25/10/02 v1.58 自作曲集計の表示を2列にする
+version = "1.58"
 
 debug = 0
 logf = ""
@@ -227,8 +227,12 @@ def read_selfmade_data() :
     #print(df_selfmade.head())
 
 #   自作曲 過去分表示
-def output_pastdata() :
-    for index,row in df_selfmade.iterrows():
+def output_pastdata(col) :
+    n = 0
+    for index,row in df_selfmade.tail(19).iterrows():   # 直近19件のみ表示
+        n += 1
+        if multi_col(n,col,10) :
+            continue
         d = row['se_date']
         d = d - timedelta(days=1)     # 実際の日付と1日ずれているので -1 日する
         date_str = d.strftime("%m/%d")
@@ -238,8 +242,10 @@ def output_pastdata() :
                   f'<td align="right">{row["q_cnt"]}</td><td align="right">{row["q_rate"]:.1f}%</td></tr>\n')
 
 #   自作曲 再生回数
-def selfmade_table() :
-    output_pastdata()
+def selfmade_table(col) :
+    output_pastdata(col)
+    if col == 1 :    # 本日分は 2列目に表示
+        return 
     day = 0 
     week = 0 
     mon = 0 
@@ -674,8 +680,11 @@ def parse_template() :
         if "%month_rank_low%" in line :
             month_rank(2)
             continue
-        if "%selfmade_table%" in line :
-            selfmade_table()
+        if "%selfmade_table1%" in line :
+            selfmade_table(1)
+            continue
+        if "%selfmade_table2%" in line :
+            selfmade_table(2)
             continue
         if "%version%" in line :
             s = line.replace("%version%",version)
