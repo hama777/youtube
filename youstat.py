@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/10/02 v1.58 自作曲集計の表示を2列にする
-version = "1.58"
+# 25/10/06 v1.59 日別自作曲回数をグラフにする
+version = "1.59"
 
 debug = 0
 logf = ""
@@ -278,6 +278,17 @@ def selfmade_table(col) :
     date_str = today_date.strftime("%y/%m/%d")
     f.write(f'{date_str}\t{day}\t{week}\t{mon}\t{mon3}\t{day_rate:.2f}\t{week_rate:.2f}\t{mon_rate:.2f}\t{mon3_rate:.2f}\n')
     f.close()
+
+def selfmade_graph() :
+    for index,row in df_selfmade.tail(30).iterrows():   # 
+        d = row['se_date']
+        d = d - timedelta(days=1)     # 実際の日付と1日ずれているので -1 日する
+        date_str = d.strftime("%d")
+        cnt = row["d_cnt"]
+        out.write(f"['{date_str}',{cnt}],") 
+    
+    # TODO: 直近のデータが対象になっていない selfmade_table を改造する必要あり
+
 
 #   網羅率を取得する
 def get_covering_rate() :
@@ -685,6 +696,9 @@ def parse_template() :
             continue
         if "%selfmade_table2%" in line :
             selfmade_table(2)
+            continue
+        if "%selfmade_graph%" in line :
+            selfmade_graph()
             continue
         if "%version%" in line :
             s = line.replace("%version%",version)
