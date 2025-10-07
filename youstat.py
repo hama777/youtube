@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/10/06 v1.59 日別自作曲回数をグラフにする
-version = "1.59"
+# 25/10/07 v1.60 自作曲回数集計処理変更
+version = "1.60"
 
 debug = 0
 logf = ""
@@ -56,10 +56,11 @@ def main_proc() :
     read_dailydata()
     read_good_data()
     read_coverrate()
-    read_selfmade_data()
+    #read_selfmade_data()
     create_repcount_info()    
     create_daily_info()
     month_count()   
+    create_selfmade_df()
     parse_template()
     output_covering_rate()
     ftp_upload()
@@ -223,11 +224,8 @@ def read_selfmade_data() :
         date_parser=lambda x: pd.to_datetime(x, format="%y/%m/%d")
     )
 
-    #print(df_selfmade.dtypes)
-    #print(df_selfmade.head())
-
 #   自作曲 過去分表示
-def output_pastdata(col) :
+def selfmade_table(col) :
     n = 0
     for index,row in df_selfmade.tail(19).iterrows():   # 直近19件のみ表示
         n += 1
@@ -242,8 +240,9 @@ def output_pastdata(col) :
                   f'<td align="right">{row["q_cnt"]}</td><td align="right">{row["q_rate"]:.1f}%</td></tr>\n')
 
 #   自作曲 再生回数
-def selfmade_table(col) :
-    output_pastdata(col)
+#       TODO: 問題なければ削除
+def selfmade_table_old(col) :
+    #output_pastdata(col)
     if col == 1 :    # 本日分は 2列目に表示
         return 
     day = 0 
@@ -278,6 +277,41 @@ def selfmade_table(col) :
     date_str = today_date.strftime("%y/%m/%d")
     f.write(f'{date_str}\t{day}\t{week}\t{mon}\t{mon3}\t{day_rate:.2f}\t{week_rate:.2f}\t{mon_rate:.2f}\t{mon3_rate:.2f}\n')
     f.close()
+
+#   自作曲の再生回数情報  df_selfmade の作成
+def create_selfmade_df() :
+    # 本日分の計算
+    day = 0 
+    week = 0 
+    mon = 0 
+    mon3 = 0
+    all_day = all_week = all_mon = all_mon3 = 0
+    for vid,video_info in rep_info.items() :
+        all_day += video_info["day"]
+        all_week += video_info["week"]
+        all_mon += video_info["mon"]
+        all_mon3 += video_info["mon3"]
+        if selflist[vid] != 0 :
+            continue
+        day += video_info["day"]
+        week += video_info["week"]
+        mon += video_info["mon"]
+        mon3 += video_info["mon3"]
+
+    day_rate = day / all_day * 100
+    week_rate = week / all_week * 100
+    mon_rate = mon / all_mon * 100
+    mon3_rate = mon3 / all_mon3 * 100
+
+    #  本日分のファイル出力
+    f = open(selfmadefile,'a', encoding='utf-8')
+    date_str = today_date.strftime("%y/%m/%d")
+    f.write(f'{date_str}\t{day}\t{week}\t{mon}\t{mon3}\t{day_rate:.2f}\t{week_rate:.2f}\t{mon_rate:.2f}\t{mon3_rate:.2f}\n')
+    f.close()
+
+    # 改めてファイルを読み本日分を含めた df_selfmade を作成する
+    read_selfmade_data()
+    #print(df_selfmade)
 
 def selfmade_graph() :
     for index,row in df_selfmade.tail(30).iterrows():   # 
