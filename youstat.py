@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/10/07 v1.60 自作曲回数集計処理変更
-version = "1.60"
+# 25/11/12 v1.61 自作曲集計表の表示件数を30件にする
+version = "1.61"
 
 debug = 0
 logf = ""
@@ -227,9 +227,9 @@ def read_selfmade_data() :
 #   自作曲 過去分表示
 def selfmade_table(col) :
     n = 0
-    for index,row in df_selfmade.tail(19).iterrows():   # 直近19件のみ表示
+    for index,row in df_selfmade.tail(30).iterrows():   # 直近19件のみ表示
         n += 1
-        if multi_col(n,col,10) :
+        if multi_col(n,col,15) :
             continue
         d = row['se_date']
         d = d - timedelta(days=1)     # 実際の日付と1日ずれているので -1 日する
@@ -238,45 +238,6 @@ def selfmade_table(col) :
                   f'<td align="right">{row["w_cnt"]}</td><td align="right">{row["w_rate"]:.1f}%</td>'
                   f'<td align="right">{row["m_cnt"]}</td><td align="right">{row["m_rate"]:.1f}%</td>'
                   f'<td align="right">{row["q_cnt"]}</td><td align="right">{row["q_rate"]:.1f}%</td></tr>\n')
-
-#   自作曲 再生回数
-#       TODO: 問題なければ削除
-def selfmade_table_old(col) :
-    #output_pastdata(col)
-    if col == 1 :    # 本日分は 2列目に表示
-        return 
-    day = 0 
-    week = 0 
-    mon = 0 
-    mon3 = 0
-    all_day = all_week = all_mon = all_mon3 = 0
-    for vid,video_info in rep_info.items() :
-        all_day += video_info["day"]
-        all_week += video_info["week"]
-        all_mon += video_info["mon"]
-        all_mon3 += video_info["mon3"]
-        if selflist[vid] != 0 :
-            continue
-        day += video_info["day"]
-        week += video_info["week"]
-        mon += video_info["mon"]
-        mon3 += video_info["mon3"]
-
-    #print(count,week_count)    
-    day_rate = day / all_day * 100
-    week_rate = week / all_week * 100
-    mon_rate = mon / all_mon * 100
-    mon3_rate = mon3 / all_mon3 * 100
-    d = yesterday.strftime("%m/%d")
-    out.write(f'<tr><td>{d}</td><td align="right">{day}</td><td align="right">{day_rate:.1f}%</td>'
-              f'<td align="right">{week}</td><td align="right">{week_rate:.1f}%</td>'
-              f'<td align="right">{mon}</td><td align="right">{mon_rate:.1f}%</td>'
-              f'<td align="right">{mon3}</td><td align="right">{mon3_rate:.1f}%</td></tr>\n')
-
-    f = open(selfmadefile,'a', encoding='utf-8')
-    date_str = today_date.strftime("%y/%m/%d")
-    f.write(f'{date_str}\t{day}\t{week}\t{mon}\t{mon3}\t{day_rate:.2f}\t{week_rate:.2f}\t{mon_rate:.2f}\t{mon3_rate:.2f}\n')
-    f.close()
 
 #   自作曲の再生回数情報  df_selfmade の作成
 def create_selfmade_df() :
