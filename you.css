@@ -1,4 +1,4 @@
-/*  25/04/10 再生回数テーブルをソートできるようにした  */
+/*  25/12/15 再生回数テーブルでgoodのカラムを太線にした  */
 table, td, th { 
     font-family: "Meiryo UI" ; 
     font-size: 14px; 
@@ -7,6 +7,12 @@ table, td, th {
     padding: 3px; 
     margin-left: 70px;
 }
+
+table th:nth-child(11),
+table td:nth-child(11) {
+    border-left: 3px solid #1C79C6;
+}
+
 table.rank {
     margin-top: 5px;
     margin-left: 10px;
