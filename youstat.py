@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/11/12 v1.61 自作曲集計表の表示件数を30件にする
-version = "1.61"
+# 25/12/18 v1.62 今月の順位を表示する
+version = "1.62"
 
 debug = 0
 logf = ""
@@ -609,6 +609,31 @@ def month_rank(flg) :
         if n >= 10 :
             break
 
+
+def cur_month_rank() :
+    yymm = (today_yy -2000) * 100 + today_mm
+    r = get_month_rank(yymm)
+    out.write(f'{r} 位 / {len(monthly_info)}\n')
+
+#   yymmの順位を返す
+def get_month_rank(yymm) :
+    if yymm not in monthly_info:
+        raise KeyError(f"{yymm} is not in monthly_info")
+    target_value = monthly_info[yymm]
+
+    # 値を昇順にソート（重複は1つにまとめる）
+    sorted_values = sorted(set(monthly_info.values()))
+
+    # 順位は1始まり
+    return sorted_values.index(target_value) + 1
+
+def month_ave_order() :
+    df_mon = df.resample(rule = "ME").mean()
+    order = int(df_mon.rank(method='min',ascending=False).iloc[-1].item())
+    count = len(df_mon)
+    return order,count
+
+
 def parse_template() :
     global out 
     f = open(templatefile , 'r', encoding='utf-8')
@@ -685,6 +710,9 @@ def parse_template() :
             continue
         if "%month_rank_low%" in line :
             month_rank(2)
+            continue
+        if "%cur_month_rank%" in line :
+            cur_month_rank()
             continue
         if "%selfmade_table1%" in line :
             selfmade_table(1)
