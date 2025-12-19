@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>Youtube statistics</title>
-<!-- 25/12/18 v1.62 今月の順位を表示する  -->
+<!-- 25/12/19 v1.63 網羅率ランキング追加  -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="you.css">
@@ -382,8 +382,16 @@
         </table>
     </div>
 </div>
-<h2>網羅率グラフ</h2>
+<h2>網羅率</h2>
 <div id="covering_rate_graph" style="width:800px; height:400px;  margin-top:20px ; margin-left:  50px; " ></div>
+ランキング
+<table class="rank">
+    <tr>
+        <th>順位</th><th>日付</th><th>網羅率</th>
+    </tr>
+    %ranking_covering_rate%
+</table>
+
 
 <script>
     const table = document.getElementById("myTable");
