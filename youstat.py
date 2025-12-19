@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/12/18 v1.62 今月の順位を表示する
-version = "1.62"
+# 25/12/19 v1.63 網羅率ランキング追加
+version = "1.63"
 
 debug = 0
 logf = ""
@@ -37,6 +37,8 @@ curdate = ""
 dailyf = ""
 df = ""
 df_movav = ""
+df_cover = ""
+
 lastdate = ""      # 最終日付
 out = ""           # html出力ファイル
 video_info = {}    # キー  vid : 値  (キー 現再生回数 , キー 前日再生回数)
@@ -114,6 +116,36 @@ def read_coverrate() :
         datedata =  dt.strptime(data[0], '%y/%m/%d')
         coverrate_info[datedata] = data[1:] 
     cf.close()
+    read_coverrate_csv()
+
+import pandas as pd
+
+def read_coverrate_csv() :
+    global df_cover
+    """
+    タブ区切り・ヘッダなしのCSVを読み込み、
+    指定フォーマットのDataFrame(df_cover)を作成する
+    """
+
+    df_cover = pd.read_csv(
+        coverratefile,
+        sep="\t",
+        header=None,
+        names=["cvdate", "day", "week", "month", "quota"]
+    )
+
+    # 日付カラムを datetime 型に変換（yy/mm/dd）
+    df_cover["cvdate"] = pd.to_datetime(
+        df_cover["cvdate"].str.strip(),
+        format="%y/%m/%d"
+    )
+
+    # 数値カラムを float に変換（念のため）
+    float_cols = ["day", "week", "month", "quota"]
+    df_cover[float_cols] = df_cover[float_cols].astype(float)
+    print(df_cover)
+
+    return 
 
 #   再生回数情報 rep_info を作成する
 #   rep_info 辞書  キー  vid  値  video_info 
@@ -360,6 +392,25 @@ def covering_rate_graph() :
     rate = get_covering_rate()
     d = yesterday.strftime("%m/%d")
     out.write(f"['{d}',{rate['day']}],")   #  前日の分は coverrate_info に含まれていないため
+
+#   網羅率ランキング
+def ranking_covering_rate() :
+    """
+    df_cover を day の降順でソートし、
+    上位10件の cvdate と day を表示する
+    """
+    top = (
+        df_cover
+        .sort_values(by="day", ascending=False)
+        .head(10)
+    )
+    n = 0 
+    for _,row  in top.iterrows() :
+        n += 1
+        dt = row['cvdate']
+        date_str = row['cvdate'].strftime("%y/%m/%d")
+        v = row['day']
+        out.write(f"<tr><td align=right>{n}</td><td>{date_str}</td><td align=right>{v}</td></tr>\n") 
 
 #  再生回数 top 
 def output_top_repcount() :
@@ -704,6 +755,9 @@ def parse_template() :
             continue
         if "%covering_rate_graph%" in line :
             covering_rate_graph()
+            continue
+        if "%ranking_covering_rate%" in line :
+            ranking_covering_rate()
             continue
         if "%month_rank_top%" in line :
             month_rank(1)
