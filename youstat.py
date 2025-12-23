@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/12/19 v1.63 網羅率ランキング追加
-version = "1.63"
+# 25/12/23 v1.64 網羅率ランキングの日付誤りを修正
+version = "1.64"
 
 debug = 0
 logf = ""
@@ -143,7 +143,6 @@ def read_coverrate_csv() :
     # 数値カラムを float に変換（念のため）
     float_cols = ["day", "week", "month", "quota"]
     df_cover[float_cols] = df_cover[float_cols].astype(float)
-    print(df_cover)
 
     return 
 
@@ -345,7 +344,7 @@ def covering_rate(col) :
         n += 1
         if multi_col(n,col,20) :
             continue
-        k = k - timedelta(days=1)
+        k = k - timedelta(days=1)   # 表示は1日ずれているため
         date_str = k.strftime("%y/%m/%d")
         s = f'<tr><td>{date_str}</td><td align="right">{v[0]}</td><td align="right">{v[1]}</td>' \
             f'<td align="right">{v[2]}</td><td align="right">{v[3]}</td></tr>\n'
@@ -386,7 +385,7 @@ def output_covering_rate() :
 def covering_rate_graph() :
     coverrate_last = dict(list(coverrate_info.items())[-119:])  #  上限120件 今日の分1件を引く
     for k,v in coverrate_last.items() :
-        k = k - timedelta(days=1)
+        k = k - timedelta(days=1)          # 表示は1日ずれているため
         date_str = k.strftime("%m/%d")
         out.write(f"['{date_str}',{v[0]}],") 
     rate = get_covering_rate()
@@ -407,8 +406,9 @@ def ranking_covering_rate() :
     n = 0 
     for _,row  in top.iterrows() :
         n += 1
-        dt = row['cvdate']
-        date_str = row['cvdate'].strftime("%y/%m/%d")
+        k = row['cvdate']
+        k = k - timedelta(days=1)          # 表示は1日ずれているため
+        date_str = k.strftime("%y/%m/%d")
         v = row['day']
         out.write(f"<tr><td align=right>{n}</td><td>{date_str}</td><td align=right>{v}</td></tr>\n") 
 
