@@ -1,7 +1,7 @@
 <html>
 <head>
 <title>Youtube statistics</title>
-<!-- 25/12/23 網羅率ランキングの位置変更  -->
+<!-- 25/12/24 v1.65 月ごとの自作件数グラフ追加  -->
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Style-Type" content="text/css">
 <link rel="stylesheet" href="you.css">
@@ -171,6 +171,29 @@
         }
     );
 </script>
+<script type="text/javascript">
+    google.load("visualization", "1", {packages:["corechart"]});
+    google.setOnLoadCallback(
+        function() {
+            var data = google.visualization.arrayToDataTable([
+    [       '', '回数'],
+%selfmade_month_graph%
+            ]);
+    
+            var options = {
+                title: '日別回数',
+                chartArea: { backgroundColor: '#f1f7f9' , left:50,right:30 },
+                colors: ['#00aae8'] ,
+                hAxis: {title: '日'},
+                legend: { position: 'none' }
+            };
+    
+            var chart = new google.visualization.ColumnChart(document.getElementById('selfmade_month_graph'));
+            chart.draw(data, options);
+        }
+    );
+</script>
+
 
 <h1>Youtube集計</h1>
 <span style="font-size:12px;">Ver : %version%</span>
@@ -241,6 +264,7 @@
 <br>
 <h2>自作曲集計</h2>
 <div id="selfmade_graph" style="width:800px; height:300px;  margin-top:20px ; margin-left:  50px; " ></div>
+<div id="selfmade_month_graph" style="width:800px; height:300px;  margin-top:20px ; margin-left:  50px; " ></div>
 <div class="flex">
     <div>
         <table>
@@ -255,7 +279,6 @@
         </table>
     </div>
 </div>
-
 
 <br>
 <h2>日別再生移動平均</h2>
