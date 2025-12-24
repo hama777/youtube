@@ -8,8 +8,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/12/23 v1.64 網羅率ランキングの日付誤りを修正
-version = "1.64"
+# 25/12/24 v1.65 月ごとの自作件数グラフ追加
+version = "1.65"
 
 debug = 0
 logf = ""
@@ -315,6 +315,18 @@ def selfmade_graph() :
     
     # TODO: 直近のデータが対象になっていない selfmade_table を改造する必要あり
 
+# 月ごとの自作件数グラフ
+def selfmade_month_graph() :
+    df_selfmade_month = (
+        df_selfmade
+        .assign(se_date=df_selfmade['se_date'].dt.to_period('M').dt.to_timestamp())
+        .groupby('se_date', as_index=False)['d_cnt']
+        .sum()
+    )
+    for index,row in df_selfmade_month.iterrows():   # 
+        d = row['se_date'].strftime("%y/%m")
+        cnt = row["d_cnt"]
+        out.write(f"['{d}',{cnt}],") 
 
 #   網羅率を取得する
 def get_covering_rate() :
@@ -776,6 +788,9 @@ def parse_template() :
             continue
         if "%selfmade_graph%" in line :
             selfmade_graph()
+            continue
+        if "%selfmade_month_graph%" in line :
+            selfmade_month_graph()
             continue
         if "%version%" in line :
             s = line.replace("%version%",version)
