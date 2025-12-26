@@ -4,12 +4,13 @@ import os
 import datetime
 import pandas as pd
 import requests
+import calendar
 from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/12/24 v1.65 月ごとの自作件数グラフ追加
-version = "1.65"
+# 25/12/26 v1.66 月ごとの自作件数グラフを日単位の回数とした
+version = "1.66"
 
 debug = 0
 logf = ""
@@ -324,9 +325,32 @@ def selfmade_month_graph() :
         .sum()
     )
     for index,row in df_selfmade_month.iterrows():   # 
-        d = row['se_date'].strftime("%y/%m")
-        cnt = row["d_cnt"]
+        se_date = row['se_date']
+        d = se_date.strftime("%y/%m")
+        yy = se_date.year
+        mm = se_date.month
+        if yy == 2025 and mm == 9 :   # 2025/09/10 始まりなので初月は21日間のみのデータ
+            days = 21  
+        else :
+            days = days_in_month_or_until_today(yy,mm)
+        cnt = row["d_cnt"] / days
         out.write(f"['{d}',{cnt}],") 
+
+def days_in_month_or_until_today(yy: int, mm: int) -> int:
+    """
+    年(yy)と月(mm)が与えられたとき、
+    - 指定年月が今日の年月と同じ場合: 今日の日付までの日数
+    - それ以外の場合: その月の総日数
+    を返す関数
+    """
+    today = date.today()
+
+    # 今日と同じ年月の場合
+    if yy == today.year and mm == today.month:
+        return today.day
+
+    # それ以外の場合は月の日数を返す
+    return calendar.monthrange(yy, mm)[1]
 
 #   網羅率を取得する
 def get_covering_rate() :
@@ -413,7 +437,7 @@ def ranking_covering_rate() :
     top = (
         df_cover
         .sort_values(by="day", ascending=False)
-        .head(10)
+        .head(15)
     )
     n = 0 
     for _,row  in top.iterrows() :
