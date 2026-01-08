@@ -9,8 +9,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 25/12/26 v1.66 月ごとの自作件数グラフを日単位の回数とした
-version = "1.66"
+# 26/01/08 v1.67 今月の順位の処理が不正だったのを修正
+version = "1.67"
 
 debug = 0
 logf = ""
@@ -704,12 +704,15 @@ def cur_month_rank() :
 
 #   yymmの順位を返す
 def get_month_rank(yymm) :
+    print(monthly_info)
     if yymm not in monthly_info:
         raise KeyError(f"{yymm} is not in monthly_info")
     target_value = monthly_info[yymm]
+    print(target_value)
 
     # 値を昇順にソート（重複は1つにまとめる）
-    sorted_values = sorted(set(monthly_info.values()))
+    sorted_values = sorted(set(monthly_info.values()), reverse=True)
+    print(sorted_values)
 
     # 順位は1始まり
     return sorted_values.index(target_value) + 1
