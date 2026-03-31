@@ -9,8 +9,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 26/01/08 v1.67 今月の順位の処理が不正だったのを修正
-version = "1.67"
+# 26/03/31 v1.68 自作曲集計表の表示を1日あたり件数に変更
+version = "1.68"
 
 debug = 0
 logf = ""
@@ -267,9 +267,9 @@ def selfmade_table(col) :
         d = d - timedelta(days=1)     # 実際の日付と1日ずれているので -1 日する
         date_str = d.strftime("%m/%d")
         out.write(f'<tr><td>{date_str}</td><td align="right">{row["d_cnt"]}</td><td align="right">{row["d_rate"]:.1f}%</td>'
-                  f'<td align="right">{row["w_cnt"]}</td><td align="right">{row["w_rate"]:.1f}%</td>'
-                  f'<td align="right">{row["m_cnt"]}</td><td align="right">{row["m_rate"]:.1f}%</td>'
-                  f'<td align="right">{row["q_cnt"]}</td><td align="right">{row["q_rate"]:.1f}%</td></tr>\n')
+                  f'<td align="right">{row["w_cnt"]/7:.2f}</td><td align="right">{row["w_rate"]:.1f}%</td>'
+                  f'<td align="right">{row["m_cnt"]/30:.2f}</td><td align="right">{row["m_rate"]:.1f}%</td>'
+                  f'<td align="right">{row["q_cnt"]/90:.2f}</td><td align="right">{row["q_rate"]:.1f}%</td></tr>\n')
 
 #   自作曲の再生回数情報  df_selfmade の作成
 def create_selfmade_df() :
@@ -704,15 +704,12 @@ def cur_month_rank() :
 
 #   yymmの順位を返す
 def get_month_rank(yymm) :
-    print(monthly_info)
     if yymm not in monthly_info:
         raise KeyError(f"{yymm} is not in monthly_info")
     target_value = monthly_info[yymm]
-    print(target_value)
 
     # 値を昇順にソート（重複は1つにまとめる）
     sorted_values = sorted(set(monthly_info.values()), reverse=True)
-    print(sorted_values)
 
     # 順位は1始まり
     return sorted_values.index(target_value) + 1
