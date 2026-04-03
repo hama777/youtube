@@ -9,8 +9,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 26/03/31 v1.68 自作曲集計表の表示を1日あたり件数に変更
-version = "1.68"
+# 26/04/03 v1.69 最終再生日を追加
+version = "1.69"
 
 debug = 0
 logf = ""
@@ -64,6 +64,7 @@ def main_proc() :
     create_daily_info()
     month_count()   
     create_selfmade_df()
+    last_play_date()
     parse_template()
     output_covering_rate()
     ftp_upload()
@@ -118,8 +119,6 @@ def read_coverrate() :
         coverrate_info[datedata] = data[1:] 
     cf.close()
     read_coverrate_csv()
-
-import pandas as pd
 
 def read_coverrate_csv() :
     global df_cover
@@ -226,12 +225,15 @@ def output_replay_count2() :
         diff_good_str = str(diff_good)
         if diff_good >= 1 :                                # good に増分がある時は赤字にする
             diff_good_str = f'<span class=red>{diff_good}</span>'
+        last_play_date = last_play_date_dict[vid].strftime("%y/%m/%d")          #  最後に再生した日付
+        #print(last_play_date)
 
         out.write(f'<td align="right">{good_cnt}</td>'
                   f'<td align="right">{diff_good_str}</td>'
                   f'<td align="right">{good_rate:.2f}</td>'
                   f'<td align="right">{good_per_month:.2f}</td>'
                   f'<td align="right">{cdatestr}</td>'
+                  f'<td align="right">{last_play_date}</td>'
                   f'</tr>\n')
 
     csvout.close()
@@ -254,6 +256,28 @@ def read_selfmade_data() :
         },
         parse_dates=["se_date"],     # se_date を日付として読み込み
         date_parser=lambda x: pd.to_datetime(x, format="%y/%m/%d")
+    )
+
+#   vid ごとに最後に再生された日付を求め辞書  last_play_date_dict に格納する
+#     last_play_date_dict   キー  vid  値  最後に再生された日付
+def last_play_date() :
+    global last_play_date_dict   
+    df_lastest = df
+
+    # vidごとに前日との差分（当日再生回数）を計算
+    df_lastest['daily_play'] = df_lastest.groupby('vid')['replay'].diff()
+
+    # 初日は diff が NaN になるので、必要なら0扱い
+    df_lastest['daily_play'] = df_lastest['daily_play'].fillna(0)
+
+    # 再生があった日（差分が0でない日）だけ抽出
+    played = df_lastest[df_lastest['daily_play'] != 0]
+
+    # vid -> 最後に再生された日付 の辞書
+    last_play_date_dict = (
+        played.groupby('vid')['date']
+        .max()
+        .to_dict()
     )
 
 #   自作曲 過去分表示
