@@ -5,7 +5,8 @@ import streamlit as st
 import pandas as pd
 import os
 
-version = "1.04"      #  23/09/17
+#  26/04/06 v1.05 videid.txt の形式変更に対応
+version = "1.05"      
 pythonexe = "D:\AP\python\python.exe"
 appdir = os.path.dirname(os.path.abspath(__file__))
 dailydata = appdir + "\\dailydata.txt"
@@ -122,7 +123,7 @@ def read_videoid() :
     idf = open(videoidf,'r', encoding='utf-8')
     for line in idf :
         line = line.strip()
-        id,title,_ = line.split("\t")
+        id,title,_,_ = line.split("\t")
         titlelist.append(title)
         title_to_id[title] = id
 
