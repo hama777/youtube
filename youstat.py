@@ -9,8 +9,8 @@ from datetime import date,timedelta
 from ftplib import FTP_TLS
 from datetime import datetime as dt
 
-# 26/04/03 v1.69 最終再生日を追加
-version = "1.69"
+# 26/04/13 v1.70 vidが新規の時、最終再生日は空白にする
+version = "1.70"
 
 debug = 0
 logf = ""
@@ -225,7 +225,8 @@ def output_replay_count2() :
         diff_good_str = str(diff_good)
         if diff_good >= 1 :                                # good に増分がある時は赤字にする
             diff_good_str = f'<span class=red>{diff_good}</span>'
-        last_play_date = last_play_date_dict[vid].strftime("%y/%m/%d")          #  最後に再生した日付
+        last_play_date = last_play_date_dict.get(vid)      # 新規の時 vid がないのでエラーを回避
+        last_play_date = last_play_date.strftime("%y/%m/%d") if last_play_date else ""  #  最後に再生した日付
         #print(last_play_date)
 
         out.write(f'<td align="right">{good_cnt}</td>'
