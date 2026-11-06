@@ -8,12 +8,12 @@ import shutil
 import smtplib
 from email.mime.text import MIMEText
 
-# 25/09/02 v1.30 デグレード修正
-version = "1.30"
+# 26/11/06 v1.31 ログを出力するようにした
+version = "1.31"
 
 logf = ""
 appdir = os.path.dirname(os.path.abspath(__file__))
-#logfile = appdir + "\\youtube.log"
+logfile = appdir + "\\youtube.log"
 videoidf = appdir + "\\videoid.txt"
 resultf = appdir + "\\result.txt"
 resultf_org = appdir + "\\result_org.txt"
@@ -71,7 +71,6 @@ def read_prevdate() :
         return
     f = open(datefile,'r', encoding='utf-8')
     prevdate  = f.readline()
-    print(prevdate)
 
 #   現在の値が過去の値よりも増えたら LINE に通知する
 def check_count(id,count,like,comment) :
@@ -129,6 +128,7 @@ def main_proc() :
     all_count = 0          #  増分の合計
     report_mes = ""     # メールする内容
 
+    shutil.copy(resultf,resultf_org)   
     #  設定ファイル読み込み
     conf = open(conffile, 'r', encoding='utf-8')
     api_key  = conf.readline().strip()
@@ -145,10 +145,12 @@ def main_proc() :
     read_videoid()
     read_current_count()
     read_prevdate()
-    shutil.copy(resultf,resultf_org)   
     resf = open(resultf,'w', encoding='utf-8')
 
     curdate = datetime.datetime.now().strftime("%Y/%m/%d")
+    curdatetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    logf = open(logfile,"a" , encoding='utf-8')
+    logf.write(f'{curdatetime} ** start **\n')
     #   前回実行時と日付が変わったら dailydata を出力する
     if curdate != prevdate :
         dailydata_flg = 1 
@@ -161,6 +163,8 @@ def main_proc() :
         count = int(res["items"][0]["statistics"]["viewCount"])
         if count == 0 :     # countが0ならエラーとみなす
             err = 1 
+            curdatetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+            logf.write(f'{curdatetime} ERROR  count 0 \n')
             break 
         like = int(res["items"][0]["statistics"]["likeCount"])
         comment = int(res["items"][0]["statistics"]["commentCount"])
@@ -190,6 +194,9 @@ def main_proc() :
     f = open(datefile,'w', encoding='utf-8')
     f.write(curdate)
     f.close()
+    curdatetime = datetime.datetime.now().strftime("%Y/%m/%d %H:%M:%S")
+    logf.write(f'{curdatetime} ** end **\n')
+    logf.close()
 
 # -------------------------------------------------------------
 main_proc()
